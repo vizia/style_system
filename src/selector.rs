@@ -1,160 +1,105 @@
+use cssparser::*;
+use parcel_selectors::{SelectorImpl, parser::Selector};
 
-use crate::Specificity;
+use crate::{PseudoClass, PseudoElement, CustomParseError, pseudoclass};
 
-use std::collections::HashSet;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Selectors;
 
-use bitflags::bitflags;
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SelectorString<'a>(pub CowRcStr<'a>);
 
-bitflags! {
-    pub struct PseudoClasses: u8 {
-        const HOVER = 1;
-        const OVER = 1 << 1;
-        const ACTIVE = 1 << 2;
-        const FOCUS = 1 << 3;
-        const DISABLED = 1 << 4;
-        const CHECKED = 1 << 5;
-        const SELECTED = 1 << 6;
-        const CUSTOM = 1 << 7;
+
+impl<'a> std::convert::From<CowRcStr<'a>> for SelectorString<'a> {
+    fn from(s: CowRcStr<'a>) -> SelectorString<'a> {
+        SelectorString(s.into())
     }
 }
 
-impl Default for PseudoClasses {
-    fn default() -> Self {
-        PseudoClasses::empty()
+
+#[derive(Debug, Clone, PartialEq, Eq, Default, Hash)]
+pub struct SelectorIdent<'i>(pub CowRcStr<'i>);
+
+impl<'a> std::convert::From<CowRcStr<'a>> for SelectorIdent<'a> {
+    fn from(s: CowRcStr<'a>) -> SelectorIdent {
+        SelectorIdent(s.into())
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Relation {
-    None,
-    Ancestor,
-    Parent,
+
+impl<'i> SelectorImpl<'i> for Selectors {
+    type AttrValue = SelectorString<'i>;
+    type Identifier = SelectorIdent<'i>;
+    type LocalName = SelectorIdent<'i>;
+    type NamespacePrefix = SelectorIdent<'i>;
+    type NamespaceUrl = SelectorIdent<'i>;
+    type BorrowedNamespaceUrl = SelectorIdent<'i>;
+    type BorrowedLocalName = SelectorIdent<'i>;
+  
+    type NonTSPseudoClass = PseudoClass<'i>;
+    type PseudoElement = PseudoElement<'i>;
+  
+    type ExtraMatchingData = ();
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Selector {
-    pub id: Option<String>,
-    pub element: Option<String>,
-    pub classes: HashSet<String>,
-    pub pseudo_classes: PseudoClasses,
-    pub relation: Relation,
-    pub asterisk: bool,
-}
+pub struct SelectorParser;
 
-impl Default for Selector {
-    fn default() -> Selector {
-        Selector {
-            id: None,
-            element: None,
-            classes: HashSet::new(),
-            pseudo_classes: PseudoClasses::empty(),
-            relation: Relation::None,
-            asterisk: false,
-        }
+impl<'i> parcel_selectors::parser::Parser<'i> for SelectorParser {
+    type Impl = Selectors;
+    type Error = CustomParseError<'i>;
+
+    fn parse_non_ts_pseudo_class(
+        &self,
+        _: SourceLocation,
+        name: CowRcStr<'i>,
+    ) -> Result<PseudoClass<'i>, ParseError<'i, Self::Error>> {
+        use PseudoClass::*;
+        let pseudo_class = match_ignore_ascii_case! { &name,
+            "hover" => Hover,
+            "active" => Active,
+            "focus" => Focus,
+            "enabled" => Enabled,
+            "disabled" => Disabled,
+            "read-only" => ReadOnly,
+            "read-write" => ReadWrite,
+            "default" => Default,
+            "checked" => Checked,
+            "indeterminate" => Indeterminate,
+            "blank" => Blank,
+            "valid" => Valid,
+            "invalid" => Invalid,
+            "in-range" => InRange,
+            "out-of-range" => OutOfRange,
+            "required" => Required,
+            "optional" => Optional,
+            "user-valid" => UserValid,
+            "user-invalid" => UserInvalid,
+
+            _ => Custom(name.into())
+        
+        };
+
+        Ok(pseudo_class)
     }
 }
 
-impl Selector {
-    pub fn new() -> Self {
-        Selector {
-            id: None,
-            element: None,
-            classes: HashSet::new(),
-            pseudo_classes: PseudoClasses::empty(),
-            relation: Relation::None,
-            asterisk: false,
-        }
-    }
 
-    pub fn element(element: &str) -> Self {
-        Selector {
-            id: None,
-            element: Some(element.to_owned()),
-            classes: HashSet::new(),
-            pseudo_classes: PseudoClasses::empty(),
-            relation: Relation::None,
-            asterisk: false,
-        }
-    }
+#[cfg(test)]
+mod tests {
+    use parcel_selectors::SelectorList;
 
-    pub fn matches(&self, entity_selector: &Selector) -> bool {
-        // Universal selector always matches
-        if self.asterisk {
-            if !self.pseudo_classes.is_empty()
-                && !self.pseudo_classes.intersects(entity_selector.pseudo_classes)
-            {
-                return false;
-            } else {
-                return true;
-            }
-        }
+    use super::*;
 
-        // Check for ID match
-        if self.id.is_some() && self.id != entity_selector.id {
-            return false;
-        }
+    const VALID_ELEMENT_SELECTOR: &str = "button";
 
-        // Check for element name match 
-        if self.element.is_some() && self.element != entity_selector.element {
-            return false;
-        }
+    //pub struct CompiledSelector(Selector<Selectors>);
 
-        // Check for classes match
-        if !self.classes.is_subset(&entity_selector.classes) {
-            return false;
-        }
-
-        if !self.pseudo_classes.is_empty()
-            && !self.pseudo_classes.intersects(entity_selector.pseudo_classes)
-        {
-            return false;
-        }
-
-        if self.asterisk != entity_selector.asterisk {
-            return false;
-        }
-
-        true
-    }
-
-
-    pub fn specificity(&self) -> Specificity {
-        Specificity([
-            if self.id.is_some() { 1 } else { 0 },
-            (self.classes.len() + self.pseudo_classes.bits().count_ones() as usize) as u8,
-            if self.element.is_some() { 1 } else { 0 },
-        ])
-    }
-
-
-    pub fn id(mut self, id: &str) -> Self {
-        self.id = Some(id.to_owned());
-        self
-    }
-
-
-    pub fn class(mut self, class: &str) -> Self {
-        self.classes.insert(class.to_string());
-        self
-    }
-
-
-    pub fn replace_class(&mut self, old: &str, new: &str) -> &mut Self {
-        self.classes.remove(old);
-        self.classes.insert(new.to_string());
-
-        self
-    }
-
-
-    pub fn set_id(&mut self, id: &str) -> &mut Self {
-        self.id = Some(id.to_owned());
-        self
-    }
-
-
-    pub fn set_element(&mut self, element: &str) -> &mut Self {
-        self.element = Some(element.to_owned());
-        self
+    #[test]
+    fn parse_element_selector() {
+        let mut parser_input = ParserInput::new(&VALID_ELEMENT_SELECTOR);
+        let mut parser = Parser::new(&mut parser_input);
+        let result = SelectorList::parse(&SelectorParser, &mut parser, parcel_selectors::parser::NestingRequirement::None);
+        println!("{:?}", result.is_ok());
+        //assert_eq!(3, result);
     }
 }
