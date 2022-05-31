@@ -1,4 +1,4 @@
-use cssparser::{BasicParseErrorKind, ParseError, ParseErrorKind, CowRcStr, Token};
+use cssparser::{CowRcStr, Token};
 use parcel_selectors::parser::SelectorParseErrorKind;
 
 #[derive(Debug, PartialEq)]
@@ -46,42 +46,60 @@ pub enum SelectorError<'i> {
 impl<'i> From<SelectorParseErrorKind<'i>> for SelectorError<'i> {
     fn from(err: SelectorParseErrorKind<'i>) -> Self {
         match &err {
-        SelectorParseErrorKind::NoQualifiedNameInAttributeSelector(t) => {
-            SelectorError::NoQualifiedNameInAttributeSelector(t.clone())
-        }
-        SelectorParseErrorKind::EmptySelector => SelectorError::EmptySelector,
-        SelectorParseErrorKind::DanglingCombinator => SelectorError::DanglingCombinator,
-        SelectorParseErrorKind::NonCompoundSelector => SelectorError::NonCompoundSelector,
-        SelectorParseErrorKind::NonPseudoElementAfterSlotted => SelectorError::NonPseudoElementAfterSlotted,
-        SelectorParseErrorKind::InvalidPseudoElementAfterSlotted => SelectorError::InvalidPseudoElementAfterSlotted,
-        SelectorParseErrorKind::InvalidPseudoElementInsideWhere => SelectorError::InvalidPseudoElementInsideWhere,
-        SelectorParseErrorKind::InvalidState => SelectorError::InvalidState,
-        SelectorParseErrorKind::MissingNestingSelector => SelectorError::MissingNestingSelector,
-        SelectorParseErrorKind::MissingNestingPrefix => SelectorError::MissingNestingPrefix,
-        SelectorParseErrorKind::UnexpectedTokenInAttributeSelector(t) => {
-            SelectorError::UnexpectedTokenInAttributeSelector(t.clone())
-        }
-        SelectorParseErrorKind::PseudoElementExpectedColon(t) => SelectorError::PseudoElementExpectedColon(t.clone()),
-        SelectorParseErrorKind::PseudoElementExpectedIdent(t) => SelectorError::PseudoElementExpectedIdent(t.clone()),
-        SelectorParseErrorKind::NoIdentForPseudo(t) => SelectorError::NoIdentForPseudo(t.clone()),
-        SelectorParseErrorKind::UnsupportedPseudoClassOrElement(t) => {
-            SelectorError::UnsupportedPseudoClassOrElement(t.clone())
-        }
-        SelectorParseErrorKind::UnexpectedIdent(t) => SelectorError::UnexpectedIdent(t.clone()),
-        SelectorParseErrorKind::ExpectedNamespace(t) => SelectorError::ExpectedNamespace(t.clone()),
-        SelectorParseErrorKind::ExpectedBarInAttr(t) => SelectorError::ExpectedBarInAttr(t.clone()),
-        SelectorParseErrorKind::BadValueInAttr(t) => SelectorError::BadValueInAttr(t.clone()),
-        SelectorParseErrorKind::InvalidQualNameInAttr(t) => SelectorError::InvalidQualNameInAttr(t.clone()),
-        SelectorParseErrorKind::ExplicitNamespaceUnexpectedToken(t) => {
-            SelectorError::ExplicitNamespaceUnexpectedToken(t.clone())
-        }
-        SelectorParseErrorKind::ClassNeedsIdent(t) => SelectorError::ClassNeedsIdent(t.clone()),
+            SelectorParseErrorKind::NoQualifiedNameInAttributeSelector(t) => {
+                SelectorError::NoQualifiedNameInAttributeSelector(t.clone())
+            }
+            SelectorParseErrorKind::EmptySelector => SelectorError::EmptySelector,
+            SelectorParseErrorKind::DanglingCombinator => SelectorError::DanglingCombinator,
+            SelectorParseErrorKind::NonCompoundSelector => SelectorError::NonCompoundSelector,
+            SelectorParseErrorKind::NonPseudoElementAfterSlotted => {
+                SelectorError::NonPseudoElementAfterSlotted
+            }
+            SelectorParseErrorKind::InvalidPseudoElementAfterSlotted => {
+                SelectorError::InvalidPseudoElementAfterSlotted
+            }
+            SelectorParseErrorKind::InvalidPseudoElementInsideWhere => {
+                SelectorError::InvalidPseudoElementInsideWhere
+            }
+            SelectorParseErrorKind::InvalidState => SelectorError::InvalidState,
+            SelectorParseErrorKind::MissingNestingSelector => SelectorError::MissingNestingSelector,
+            SelectorParseErrorKind::MissingNestingPrefix => SelectorError::MissingNestingPrefix,
+            SelectorParseErrorKind::UnexpectedTokenInAttributeSelector(t) => {
+                SelectorError::UnexpectedTokenInAttributeSelector(t.clone())
+            }
+            SelectorParseErrorKind::PseudoElementExpectedColon(t) => {
+                SelectorError::PseudoElementExpectedColon(t.clone())
+            }
+            SelectorParseErrorKind::PseudoElementExpectedIdent(t) => {
+                SelectorError::PseudoElementExpectedIdent(t.clone())
+            }
+            SelectorParseErrorKind::NoIdentForPseudo(t) => {
+                SelectorError::NoIdentForPseudo(t.clone())
+            }
+            SelectorParseErrorKind::UnsupportedPseudoClassOrElement(t) => {
+                SelectorError::UnsupportedPseudoClassOrElement(t.clone())
+            }
+            SelectorParseErrorKind::UnexpectedIdent(t) => SelectorError::UnexpectedIdent(t.clone()),
+            SelectorParseErrorKind::ExpectedNamespace(t) => {
+                SelectorError::ExpectedNamespace(t.clone())
+            }
+            SelectorParseErrorKind::ExpectedBarInAttr(t) => {
+                SelectorError::ExpectedBarInAttr(t.clone())
+            }
+            SelectorParseErrorKind::BadValueInAttr(t) => SelectorError::BadValueInAttr(t.clone()),
+            SelectorParseErrorKind::InvalidQualNameInAttr(t) => {
+                SelectorError::InvalidQualNameInAttr(t.clone())
+            }
+            SelectorParseErrorKind::ExplicitNamespaceUnexpectedToken(t) => {
+                SelectorError::ExplicitNamespaceUnexpectedToken(t.clone())
+            }
+            SelectorParseErrorKind::ClassNeedsIdent(t) => SelectorError::ClassNeedsIdent(t.clone()),
         }
     }
 }
 
 impl<'i> SelectorError<'i> {
-    fn reason(&self) -> String {
+    fn _reason(&self) -> String {
         use SelectorError::*;
         match self {
         NoQualifiedNameInAttributeSelector(token) => format!("No qualified name in attribute selector: {:?}.", token),

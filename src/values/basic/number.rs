@@ -1,6 +1,6 @@
 use cssparser::*;
 
-use crate::{Calc, CustomParseError, Parse};
+use crate::{impl_parse_expect, Calc, CustomParseError, Parse};
 
 impl<'i> Parse<'i> for f32 {
     fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
@@ -34,3 +34,19 @@ impl std::convert::From<Calc<f32>> for f32 {
         }
     }
 }
+
+// TODO Support Calc for these types. f32 already supports it (see above)
+impl_parse_expect!(i8, expect_integer, as i8);
+impl_parse_expect!(i16, expect_integer, as i16);
+impl_parse_expect!(i32, expect_integer, as i32);
+impl_parse_expect!(i64, expect_integer, as i64);
+impl_parse_expect!(i128, expect_integer, as i128);
+
+impl_parse_expect!(u8, expect_integer, as u8);
+impl_parse_expect!(u16, expect_integer, as u16);
+impl_parse_expect!(u32, expect_integer, as u32);
+impl_parse_expect!(u64, expect_integer, as u64);
+impl_parse_expect!(u128, expect_integer, as u128);
+
+// impl_parse_expect!(f32, expect_number, as f32);
+impl_parse_expect!(f64, expect_number, as f64);

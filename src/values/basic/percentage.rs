@@ -78,7 +78,7 @@ impl<'i> Parse<'i> for NumberOrPercentage {
             return Ok(NumberOrPercentage::Number(number));
         }
 
-        if let Ok(percent) = input.try_parse(|input| Percentage::parse(input)) {
+        if let Ok(percent) = input.try_parse(Percentage::parse) {
             return Ok(NumberOrPercentage::Percentage(percent));
         }
 

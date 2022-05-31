@@ -1,8 +1,8 @@
-use super::length::LengthPercentage;
-use super::percentage::Percentage;
 use crate::error::CustomParseError;
-use crate::macros::enum_property;
+use crate::horizontal_position_keyword::HorizontalPositionKeyword;
 use crate::traits::Parse;
+use crate::vertical_position_keyword::VerticalPositionKeyword;
+use crate::{LengthPercentage, Percentage};
 use cssparser::*;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -168,26 +168,12 @@ impl<'i, S: Parse<'i>> Parse<'i> for PositionComponent<S> {
     }
 }
 
-enum_property! {
-    pub enum HorizontalPositionKeyword {
-        Left,
-        Right,
-    }
-}
-
 impl Into<LengthPercentage> for HorizontalPositionKeyword {
     fn into(self) -> LengthPercentage {
         match self {
             HorizontalPositionKeyword::Left => LengthPercentage::zero(),
             HorizontalPositionKeyword::Right => LengthPercentage::Percentage(Percentage(1.0)),
         }
-    }
-}
-
-enum_property! {
-    pub enum VerticalPositionKeyword {
-        Top,
-        Bottom,
     }
 }
 
