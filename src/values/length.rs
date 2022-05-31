@@ -2,6 +2,7 @@ use super::calc::Calc;
 use super::percentage::DimensionPercentage;
 use crate::error::CustomParseError;
 use crate::traits::{Parse, TryAdd};
+use crate::{impl_parse_try_parse, LengthValue};
 use cssparser::*;
 
 /// https://drafts.csswg.org/css-values-4/#typedef-length-percentage
@@ -35,227 +36,6 @@ impl<'i> Parse<'i> for LengthPercentageOrAuto {
         }
 
         Err(input.new_error_for_next_token())
-    }
-}
-
-const PX_PER_IN: f32 = 96.0;
-const PX_PER_CM: f32 = PX_PER_IN / 2.54;
-const PX_PER_MM: f32 = PX_PER_CM / 10.0;
-const PX_PER_Q: f32 = PX_PER_CM / 40.0;
-const PX_PER_PT: f32 = PX_PER_IN / 72.0;
-const PX_PER_PC: f32 = PX_PER_IN / 6.0;
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum LengthValue {
-    Px(f32),
-    In(f32),
-    Cm(f32),
-    Mm(f32),
-    Q(f32),
-    Pt(f32),
-    Pc(f32),
-    Em(f32),
-    Ex(f32),
-    Ch(f32),
-    Rem(f32),
-    Vw(f32),
-    Vh(f32),
-    Vmin(f32),
-    Vmax(f32),
-}
-
-impl<'i> Parse<'i> for LengthValue {
-    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
-        let location = input.current_source_location();
-        let token = input.next()?;
-        match *token {
-            Token::Dimension {
-                value, ref unit, ..
-            } => Ok(match_ignore_ascii_case! { unit,
-              "px" => LengthValue::Px(value),
-              "in" => LengthValue::In(value),
-              "cm" => LengthValue::Cm(value),
-              "mm" => LengthValue::Mm(value),
-              "q" => LengthValue::Q(value),
-              "pt" => LengthValue::Pt(value),
-              "pc" => LengthValue::Pc(value),
-              "em" => LengthValue::Em(value),
-              "ex" => LengthValue::Ex(value),
-              "ch" => LengthValue::Ch(value),
-              "rem" => LengthValue::Rem(value),
-              "vw" => LengthValue::Vw(value),
-              "vh" => LengthValue::Vh(value),
-              "vmin" => LengthValue::Vmin(value),
-              "vmax" => LengthValue::Vmax(value),
-              _ => return Err(location.new_unexpected_token_error(token.clone())),
-            }),
-            Token::Number { value, .. } => {
-                // TODO: quirks mode only?
-                Ok(LengthValue::Px(value))
-            }
-            ref token => return Err(location.new_unexpected_token_error(token.clone())),
-        }
-    }
-}
-
-impl LengthValue {
-    pub fn to_px(&self) -> Option<f32> {
-        use LengthValue::*;
-        match self {
-            Px(value) => Some(*value),
-            In(value) => Some(value * PX_PER_IN),
-            Cm(value) => Some(value * PX_PER_CM),
-            Mm(value) => Some(value * PX_PER_MM),
-            Q(value) => Some(value * PX_PER_Q),
-            Pt(value) => Some(value * PX_PER_PT),
-            Pc(value) => Some(value * PX_PER_PC),
-            _ => None,
-        }
-    }
-
-    pub fn to_unit_value(&self) -> (f32, &str) {
-        use LengthValue::*;
-        match self {
-            Px(value) => (*value, "px"),
-            In(value) => (*value, "in"),
-            Cm(value) => (*value, "cm"),
-            Mm(value) => (*value, "mm"),
-            Q(value) => (*value, "q"),
-            Pt(value) => (*value, "pt"),
-            Pc(value) => (*value, "pc"),
-            Em(value) => (*value, "em"),
-            Ex(value) => (*value, "ex"),
-            Ch(value) => (*value, "ch"),
-            Rem(value) => (*value, "rem"),
-            Vw(value) => (*value, "vw"),
-            Vh(value) => (*value, "vh"),
-            Vmin(value) => (*value, "vmin"),
-            Vmax(value) => (*value, "vmax"),
-        }
-    }
-}
-
-impl TryAdd<LengthValue> for LengthValue {
-    fn try_add(&self, other: &LengthValue) -> Option<LengthValue> {
-        use LengthValue::*;
-        match (self, other) {
-            (Px(a), Px(b)) => Some(Px(a + b)),
-            (In(a), In(b)) => Some(In(a + b)),
-            (Cm(a), Cm(b)) => Some(Cm(a + b)),
-            (Mm(a), Mm(b)) => Some(Mm(a + b)),
-            (Q(a), Q(b)) => Some(Q(a + b)),
-            (Pt(a), Pt(b)) => Some(Pt(a + b)),
-            (Pc(a), Pc(b)) => Some(Pc(a + b)),
-            (Em(a), Em(b)) => Some(Em(a + b)),
-            (Ex(a), Ex(b)) => Some(Ex(a + b)),
-            (Ch(a), Ch(b)) => Some(Ch(a + b)),
-            (Rem(a), Rem(b)) => Some(Rem(a + b)),
-            (Vw(a), Vw(b)) => Some(Vw(a + b)),
-            (Vh(a), Vh(b)) => Some(Vh(a + b)),
-            (Vmin(a), Vmin(b)) => Some(Vmin(a + b)),
-            (Vmax(a), Vmax(b)) => Some(Vmax(a + b)),
-            (a, b) => {
-                if let (Some(a), Some(b)) = (a.to_px(), b.to_px()) {
-                    Some(Px(a + b))
-                } else {
-                    None
-                }
-            }
-        }
-    }
-}
-
-impl std::ops::Mul<f32> for LengthValue {
-    type Output = Self;
-
-    fn mul(self, other: f32) -> LengthValue {
-        use LengthValue::*;
-        match self {
-            Px(value) => Px(value * other),
-            In(value) => In(value * other),
-            Cm(value) => Cm(value * other),
-            Mm(value) => Mm(value * other),
-            Q(value) => Q(value * other),
-            Pt(value) => Pt(value * other),
-            Pc(value) => Pc(value * other),
-            Em(value) => Em(value * other),
-            Ex(value) => Ex(value * other),
-            Ch(value) => Ch(value * other),
-            Rem(value) => Rem(value * other),
-            Vw(value) => Vw(value * other),
-            Vh(value) => Vh(value * other),
-            Vmin(value) => Vmin(value * other),
-            Vmax(value) => Vmax(value * other),
-        }
-    }
-}
-
-impl std::cmp::PartialEq<f32> for LengthValue {
-    fn eq(&self, other: &f32) -> bool {
-        use LengthValue::*;
-        match self {
-            Px(value) => value == other,
-            In(value) => value == other,
-            Cm(value) => value == other,
-            Mm(value) => value == other,
-            Q(value) => value == other,
-            Pt(value) => value == other,
-            Pc(value) => value == other,
-            Em(value) => value == other,
-            Ex(value) => value == other,
-            Ch(value) => value == other,
-            Rem(value) => value == other,
-            Vw(value) => value == other,
-            Vh(value) => value == other,
-            Vmin(value) => value == other,
-            Vmax(value) => value == other,
-        }
-    }
-}
-
-impl std::cmp::PartialOrd<f32> for LengthValue {
-    fn partial_cmp(&self, other: &f32) -> Option<std::cmp::Ordering> {
-        use LengthValue::*;
-        match self {
-            Px(value) => value.partial_cmp(other),
-            In(value) => value.partial_cmp(other),
-            Cm(value) => value.partial_cmp(other),
-            Mm(value) => value.partial_cmp(other),
-            Q(value) => value.partial_cmp(other),
-            Pt(value) => value.partial_cmp(other),
-            Pc(value) => value.partial_cmp(other),
-            Em(value) => value.partial_cmp(other),
-            Ex(value) => value.partial_cmp(other),
-            Ch(value) => value.partial_cmp(other),
-            Rem(value) => value.partial_cmp(other),
-            Vw(value) => value.partial_cmp(other),
-            Vh(value) => value.partial_cmp(other),
-            Vmin(value) => value.partial_cmp(other),
-            Vmax(value) => value.partial_cmp(other),
-        }
-    }
-}
-
-impl std::cmp::PartialOrd<LengthValue> for LengthValue {
-    fn partial_cmp(&self, other: &LengthValue) -> Option<std::cmp::Ordering> {
-        use LengthValue::*;
-        match (self, other) {
-            (Em(a), Em(b))
-            | (Ex(a), Ex(b))
-            | (Ch(a), Ch(b))
-            | (Rem(a), Rem(b))
-            | (Vw(a), Vw(b))
-            | (Vh(a), Vh(b))
-            | (Vmin(a), Vmin(b))
-            | (Vmax(a), Vmax(b)) => a.partial_cmp(b),
-            (a, b) => {
-                if let (Some(a), Some(b)) = (a.to_px(), b.to_px()) {
-                    a.partial_cmp(&b)
-                } else {
-                    None
-                }
-            }
-        }
     }
 }
 
@@ -457,52 +237,51 @@ impl Default for LengthOrNumber {
     }
 }
 
-impl<'i> Parse<'i> for LengthOrNumber {
-    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
-        // Parse number first so unitless numbers are not parsed as lengths.
-        if let Ok(number) = input.try_parse(f32::parse) {
-            return Ok(LengthOrNumber::Number(number));
-        }
+impl_parse_try_parse!(LengthOrNumber => f32, Length);
 
-        if let Ok(length) = Length::parse(input) {
-            return Ok(LengthOrNumber::Length(length));
-        }
-
-        Err(input.new_error_for_next_token())
+impl From<f32> for LengthOrNumber {
+    fn from(number: f32) -> Self {
+        Self::Number(number)
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const VALID_LENGTH_VALUE_PX: &str = "100px";
-
-    #[test]
-    fn parse_length_value_px() {
-        let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_PX);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = LengthValue::parse(&mut parser);
-        assert_eq!(result, Ok(LengthValue::Px(100.0)));
-    }
-
-    const VALID_LENGTH_VALUE_IN: &str = "100in";
-
-    #[test]
-    fn parse_length_value_in() {
-        let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_IN);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = LengthValue::parse(&mut parser);
-        assert_eq!(result, Ok(LengthValue::In(100.0)));
-    }
-
-    const VALID_LENGTH_VALUE_CM: &str = "100cm";
-
-    #[test]
-    fn parse_length_value_cm() {
-        let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_CM);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = LengthValue::parse(&mut parser);
-        assert_eq!(result, Ok(LengthValue::Cm(100.0)));
+impl From<Length> for LengthOrNumber {
+    fn from(length: Length) -> Self {
+        Self::Length(length)
     }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+
+//     const VALID_LENGTH_VALUE_PX: &str = "100px";
+
+//     #[test]
+//     fn parse_length_value_px() {
+//         let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_PX);
+//         let mut parser = Parser::new(&mut parser_input);
+//         let result = LengthValue::parse(&mut parser);
+//         assert_eq!(result, Ok(LengthValue::Px(100.0)));
+//     }
+
+//     const VALID_LENGTH_VALUE_IN: &str = "100in";
+
+//     #[test]
+//     fn parse_length_value_in() {
+//         let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_IN);
+//         let mut parser = Parser::new(&mut parser_input);
+//         let result = LengthValue::parse(&mut parser);
+//         assert_eq!(result, Ok(LengthValue::In(100.0)));
+//     }
+
+//     const VALID_LENGTH_VALUE_CM: &str = "100cm";
+
+//     #[test]
+//     fn parse_length_value_cm() {
+//         let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_CM);
+//         let mut parser = Parser::new(&mut parser_input);
+//         let result = LengthValue::parse(&mut parser);
+//         assert_eq!(result, Ok(LengthValue::Cm(100.0)));
+//     }
+// }

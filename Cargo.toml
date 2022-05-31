@@ -3,7 +3,6 @@ name = "style_system"
 version = "0.1.0"
 edition = "2021"
 
-
 [dependencies]
-cssparser = "0.29.2"
+cssparser = "0.29.6"
 parcel_selectors = { version = "0.24.2", path = "./selectors" }
