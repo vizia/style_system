@@ -1,11 +1,8 @@
-use crate::{macros::define_enum_value, Parse};
+use crate::{impl_parse_ident, Parse};
+pub use morphorm::PositionType;
 
-define_enum_value! {
-    /// The position type determines whether a node will be positioned in-line with its siblings or separate.
-    pub enum PositionType {
-        /// The node is positioned relative to the parent but ignores its siblings.
-        "self-directed": SelfDirected,
-        /// The node is positioned relative to the parent and in-line with its siblings.
-        "parent-directed": ParentDirected,
-    }
+impl_parse_ident! {
+    PositionType,
+    "self-directed" => PositionType::SelfDirected,
+    "parent-directed" => PositionType::ParentDirected,
 }

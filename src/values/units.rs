@@ -2,19 +2,7 @@ use crate::{
     auto::Auto, length::Length, macros::impl_parse_try_parse, percentage::Percentage,
     stretch::Stretch, Parse,
 };
-
-/// A value that describes spacing and size.
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum Units {
-    /// The number of pixels.
-    Pixels(f32),
-    /// The percentage of the parent dimension.
-    Percentage(f32),
-    /// The factor of the remaining free space.
-    Stretch(f32),
-    /// Automatically determine the value.
-    Auto,
-}
+pub use morphorm::Units;
 
 impl_parse_try_parse!(Units => Auto, Stretch, Percentage, Length);
 
