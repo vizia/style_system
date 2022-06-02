@@ -198,21 +198,21 @@ macro_rules! with_all_bounds {
         /// are parameterized on SelectorImpl. See
         /// <https://github.com/rust-lang/rust/issues/26925>
         pub trait SelectorImpl<'i>: Clone + Debug + Sized + 'static {
-            type ExtraMatchingData: Sized + Default + 'static;
-            type AttrValue: $($InSelector)*;
-            type Identifier: $($InSelector)*;
-            type LocalName: $($InSelector)* + Borrow<Self::BorrowedLocalName>;
-            type NamespaceUrl: $($CommonBounds)* + Default + Borrow<Self::BorrowedNamespaceUrl>;
-            type NamespacePrefix: $($InSelector)* + Default;
-            type BorrowedNamespaceUrl: ?Sized + Eq;
-            type BorrowedLocalName: ?Sized + Eq;
+            type ExtraMatchingData: Sized + Default + Debug + 'static;
+            type AttrValue: $($InSelector)* + Debug;
+            type Identifier: $($InSelector)* + Debug;
+            type LocalName: $($InSelector)* + Borrow<Self::BorrowedLocalName> + Debug;
+            type NamespaceUrl: $($CommonBounds)* + Default + Borrow<Self::BorrowedNamespaceUrl> + Debug;
+            type NamespacePrefix: $($InSelector)* + Default + Debug;
+            type BorrowedNamespaceUrl: ?Sized + Eq + Debug;
+            type BorrowedLocalName: ?Sized + Eq + Debug;
 
             /// non tree-structural pseudo-classes
             /// (see: https://drafts.csswg.org/selectors/#structural-pseudos)
-            type NonTSPseudoClass: $($CommonBounds)* + NonTSPseudoClass<'i, Impl = Self>;
+            type NonTSPseudoClass: $($CommonBounds)* + NonTSPseudoClass<'i, Impl = Self> + Debug;
 
             /// pseudo-elements
-            type PseudoElement: $($CommonBounds)* + PseudoElement<'i, Impl = Self>;
+            type PseudoElement: $($CommonBounds)* + PseudoElement<'i, Impl = Self> + Debug;
         }
     }
 }
@@ -337,8 +337,10 @@ pub trait Parser<'i> {
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
-pub struct SelectorList<'i, Impl: SelectorImpl<'i>>(pub SmallVec<[Selector<'i, Impl>; 1]>);
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct SelectorList<'i, Impl: SelectorImpl<'i>>(
+    pub SmallVec<[Selector<'i, Impl>; 1]>,
+);
 
 /// How to treat invalid selectors in a selector list.
 pub enum ParseErrorRecovery {
@@ -628,8 +630,11 @@ pub fn namespace_empty_string<'i, Impl: SelectorImpl<'i>>() -> Impl::NamespaceUr
 ///
 /// This reordering doesn't change the semantics of selector matching, and we
 /// handle it in to_css to make it invisible to serialization.
-#[derive(Clone, Eq, PartialEq)]
-pub struct Selector<'i, Impl: SelectorImpl<'i>>(SpecificityAndFlags, Vec<Component<'i, Impl>>);
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct Selector<'i, Impl: SelectorImpl<'i>>(
+    SpecificityAndFlags,
+    Vec<Component<'i, Impl>>,
+);
 
 impl<'i, Impl: SelectorImpl<'i>> Selector<'i, Impl> {
     #[inline]
@@ -1054,7 +1059,7 @@ impl Combinator {
 /// optimal packing and cache performance, see [1].
 ///
 /// [1] https://bugzilla.mozilla.org/show_bug.cgi?id=1357973
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Component<'i, Impl: SelectorImpl<'i>> {
     Combinator(Combinator),
 
@@ -1287,7 +1292,7 @@ impl<'i, Impl: SelectorImpl<'i>> Component<'i, Impl> {
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct LocalName<'i, Impl: SelectorImpl<'i>> {
     pub name: Impl::LocalName,
     pub lower_name: Impl::LocalName,

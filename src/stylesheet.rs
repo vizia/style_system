@@ -1,15 +1,27 @@
-use crate::{parser::rule::RuleParser, rule::StyleRule, CustomParseError};
+use crate::ParserOptions;
+use crate::error::Error;
+
+use crate::{parser::rule::RuleParser, rule::StyleRule, CustomParseError, CssRuleList};
 use cssparser::*;
 
 #[derive(Debug)]
-pub struct StyleSheet {
-    // TODO Use this
-    #[allow(dead_code)]
-    rules: Vec<StyleRule>,
+pub struct StyleSheet<'i> {
+    // List of top level rules
+    rules: CssRuleList<'i>,
 }
 
-impl StyleSheet {
-    pub fn from_string<'i>(
+impl<'i> StyleSheet<'i> {
+
+
+    pub fn parse(code: &'i str, options: &ParserOptions<'i>) -> Result<Self, Error<CustomParseError<'i>>> {
+        let mut input = ParserInput::new(&code);
+        let mut parser = Parser::new(&mut input);
+        let rule_list_parser = RuleListParser::new_for_stylesheet(&mut parser, TopLevelRuleParser::new(&options));
+
+        
+    }
+
+    pub fn from_string(
         string: &'i str,
     ) -> Result<Self, (ParseError<'i, CustomParseError<'i>>, &str)> {
         let mut input = ParserInput::new(string);
