@@ -1,23 +1,29 @@
 use crate::{macros::impl_parse_expect, Parse};
+use cssparser::Token;
 
-impl_parse_expect!(String, expect_string, .as_ref().to_owned());
+impl_parse_expect! {
+    String,
+    Token::QuotedString(ref value) => value.as_ref().to_owned(),
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::tests::assert_parse_value;
 
-    #[test]
-    fn test_success() {
-        assert_parse_value!(String, r#""test""#, String::from("test"));
-        assert_parse_value!(String, r#"'test'"#, String::from("test"));
-        assert_parse_value!(String, r#""abc"def"ghi""#, String::from("abc"));
-        assert_parse_value!(String, r#""a b c d e f g""#, String::from("a b c d e f g"));
-    }
+    assert_parse_value! {
+        String, string,
 
-    #[test]
-    fn test_failure() {
-        assert_parse_value!(String, "test");
-        assert_parse_value!(String, "123");
+        success {
+            r#""test""# => String::from("test"),
+            r#"'test'"# => String::from("test"),
+            r#""abc"def"ghi""# => String::from("abc"),
+            r#""a b c d e f g""# => String::from("a b c d e f g"),
+        }
+
+        failure {
+            "test",
+            "123",
+        }
     }
 }

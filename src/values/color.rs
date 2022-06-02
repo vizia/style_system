@@ -9,7 +9,10 @@ pub enum Color {
     RGBA(RGBA),
 }
 
-impl_parse_try_parse!(Color => cssparser::Color);
+impl_parse_try_parse! {
+    Color,
+    cssparser::Color,
+}
 
 impl From<cssparser::Color> for Color {
     fn from(color: cssparser::Color) -> Self {
@@ -273,23 +276,21 @@ mod tests {
     use super::*;
     use crate::tests::assert_parse_value;
 
-    #[test]
-    fn test_success() {
-        assert_parse_value!(Color, "#000000", Color::RGBA(RGBA::rgb(0, 0, 0)));
-        assert_parse_value!(Color, "#FFFFFF", Color::RGBA(RGBA::rgb(255, 255, 255)));
-        assert_parse_value!(Color, "#123456", Color::RGBA(RGBA::rgb(18, 52, 86)));
-        assert_parse_value!(
-            Color,
-            "rgba(12, 34, 56, 0.3)",
-            Color::RGBA(RGBA::rgba(12, 34, 56, 77))
-        );
-        assert_parse_value!(Color, "red", Color::RGBA(RGBA::rgb(255, 0, 0)));
-    }
+    assert_parse_value! {
+        Color, color,
 
-    #[test]
-    fn test_failure() {
-        assert_parse_value!(Color, "#000000000");
-        assert_parse_value!(Color, "0");
-        assert_parse_value!(Color, "#000000000");
+        success {
+            "#000000" => Color::RGBA(RGBA::rgb(0, 0, 0)),
+            "#FFFFFF" => Color::RGBA(RGBA::rgb(255, 255, 255)),
+            "#123456" => Color::RGBA(RGBA::rgb(18, 52, 86)),
+            "rgba(12, 34, 56, 0.3)" => Color::RGBA(RGBA::rgba(12, 34, 56, 77)),
+            "red" => Color::RGBA(RGBA::rgb(255, 0, 0)),
+        }
+
+        failure {
+            "0",
+            "#000000000",
+            "#FFFFFFFFF",
+        }
     }
 }

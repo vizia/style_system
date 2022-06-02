@@ -8,8 +8,11 @@ use crate::{
 pub struct Stretch(pub f32);
 
 impl_parse_dimension! {
-    Stretch,
+    Stretch, stretch,
+
     "st" => Stretch,
 }
 
-impl_from_newtype!(Stretch => f32);
+impl_from_newtype! {
+    Stretch(f32),
+}

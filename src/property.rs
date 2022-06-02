@@ -2,7 +2,7 @@ use crate::{
     border_corner_shape::BorderCornerShape, box_shadow::BoxShadow, color::Color,
     cursor_icon::CursorIcon, display::Display, layout_type::LayoutType, macros::define_property,
     overflow::Overflow, position_type::PositionType, transition::Transition, units::Units,
-    visibility::Visibility, BorderRadius, CustomParseError, FontSize, Opacity, Parse,
+    visibility::Visibility, BorderRadius, CustomParseError, FontSize, Length, Opacity, Parse,
 };
 use cssparser::Parser;
 
@@ -53,13 +53,13 @@ define_property! {
 
         // Border Radius
         "border-radius": BorderRadius(BorderRadius),
-        "border-top-left-radius": BorderTopLeftRadius(Units),
-        "border-top-right-radius": BorderTopRightRadius(Units),
-        "border-bottom-left-radius": BorderBottomLeftRadius(Units),
-        "border-bottom-right-radius": BorderBottomRightRadius(Units),
+        "border-top-left-radius": BorderTopLeftRadius(Length),
+        "border-top-right-radius": BorderTopRightRadius(Length),
+        "border-bottom-left-radius": BorderBottomLeftRadius(Length),
+        "border-bottom-right-radius": BorderBottomRightRadius(Length),
 
         // Border Width
-        "border-width": BorderWidth(Units),
+        "border-width": BorderWidth(Length),
 
         // Border Color
         "border-color": BorderColor(Color),
@@ -87,15 +87,15 @@ define_property! {
 
         // Shadow
         "outer-shadow": OuterShadow(BoxShadow),
-        "outer-shadow-h-offset": OuterShadowHOffset(Units),
-        "outer-shadow-v-offset": OuterShadowVOffset(Units),
-        "outer-shadow-blur": OuterShadowBlur(Units),
+        "outer-shadow-h-offset": OuterShadowHOffset(Length),
+        "outer-shadow-v-offset": OuterShadowVOffset(Length),
+        "outer-shadow-blur": OuterShadowBlur(Length),
         "outer-shadow-color": OuterShadowColor(Color),
 
         "inner-shadow": InnerShadow(BoxShadow),
-        "inner-shadow-h-offset": InnerShadowHOffset(Units),
-        "inner-shadow-v-offset": InnerShadowVOffset(Units),
-        "iner-shadow-blur": InnerShadowBlur(Units),
+        "inner-shadow-h-offset": InnerShadowHOffset(Length),
+        "inner-shadow-v-offset": InnerShadowVOffset(Length),
+        "iner-shadow-blur": InnerShadowBlur(Length),
         "inner-shadow-color": InnerShadowColor(Color),
         "transition": Transition(Vec<Transition>),
         "z-index": ZIndex(i32),

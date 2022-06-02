@@ -1,14 +1,22 @@
 use crate::{macros::impl_parse_try_parse, Length, Parse, Rect};
 
+/// Defines the border radius of every corner of a rectangle.
 #[derive(Debug, Clone, PartialEq)]
 pub struct BorderRadius {
+    /// The border radius of the top-left corner.
     pub top_left_radius: Length,
+    /// The border radius of the top-right corner.
     pub top_right_radius: Length,
+    /// The border radius of the bottom-right corner.
     pub bottom_right_radius: Length,
+    /// The border radius of the bottom-left corner.
     pub bottom_left_radius: Length,
 }
 
-impl_parse_try_parse!(BorderRadius => Rect<Length>);
+impl_parse_try_parse! {
+    BorderRadius,
+    Rect<Length>,
+}
 
 impl From<Rect<Length>> for BorderRadius {
     fn from(rect: Rect<Length>) -> Self {
@@ -27,7 +35,7 @@ mod tests {
     use crate::tests::assert_parse_value;
 
     macro_rules! border_radius {
-        ($top_left: expr, $top_right: expr, $bottom_right: expr, $bottom_left: expr$(,)?) => {{
+        ($top_left: expr, $top_right: expr, $bottom_right: expr, $bottom_left: expr) => {{
             use $crate::Length::*;
             use $crate::LengthValue::*;
 
@@ -40,36 +48,19 @@ mod tests {
         }};
     }
 
-    #[test]
-    fn test_sucess() {
-        assert_parse_value!(
-            BorderRadius,
-            "10px",
-            border_radius!(Px(10.0), Px(10.0), Px(10.0), Px(10.0))
-        );
+    assert_parse_value! {
+        BorderRadius, border_radius,
 
-        assert_parse_value!(
-            BorderRadius,
-            "10px 20px",
-            border_radius!(Px(10.0), Px(20.0), Px(10.0), Px(20.0))
-        );
+        success {
+            "10px" => border_radius!(Px(10.0), Px(10.0), Px(10.0), Px(10.0)),
+            "10px 20px" => border_radius!(Px(10.0), Px(20.0), Px(10.0), Px(20.0)),
+            "10px 20px 30px" => border_radius!(Px(10.0), Px(20.0), Px(30.0), Px(20.0)),
+            "10px 20px 30px 40px" => border_radius!(Px(10.0), Px(20.0), Px(30.0), Px(40.0)),
+        }
 
-        assert_parse_value!(
-            BorderRadius,
-            "10px 20px 30px",
-            border_radius!(Px(10.0), Px(20.0), Px(30.0), Px(20.0))
-        );
-
-        assert_parse_value!(
-            BorderRadius,
-            "10px 20px 30px 40px",
-            border_radius!(Px(10.0), Px(20.0), Px(30.0), Px(40.0))
-        );
-    }
-
-    #[test]
-    fn test_failure() {
-        assert_parse_value!(BorderRadius, "px");
-        assert_parse_value!(BorderRadius, "10px 20px 30px 40px 50px");
+        failure {
+            "px",
+            "10px 20px 30px 40px 50px",
+        }
     }
 }

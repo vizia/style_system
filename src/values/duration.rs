@@ -10,9 +10,12 @@ use crate::{
 pub struct Duration(pub f32);
 
 impl_parse_dimension! {
-    Duration,
+    Duration, duration,
+
     "s" => Duration,
     "ms" => Duration(0.001),
 }
 
-impl_from_newtype!(Duration => f32);
+impl_from_newtype! {
+    Duration(f32),
+}
