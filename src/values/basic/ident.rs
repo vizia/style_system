@@ -1,8 +1,8 @@
-use cssparser::{Parser, CowRcStr, ParseError, Token};
+use cssparser::{CowRcStr, ParseError, Parser, Token};
 
 use crate::{
     macros::{impl_from_newtype, impl_parse_expect},
-    Parse, CustomParseError,
+    CustomParseError, Parse,
 };
 
 /// A simple ident stored.
@@ -57,6 +57,6 @@ impl<'i> Parse<'i> for DashedIdent<'i> {
             return Err(location.new_unexpected_token_error(Token::Ident(ident.clone())));
         }
 
-        Ok(DashedIdent(*ident))
+        Ok(DashedIdent(ident.clone()))
     }
 }

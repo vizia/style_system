@@ -19,10 +19,6 @@ impl<'i> parcel_selectors::parser::PseudoElement<'i> for PseudoElement<'i> {
 
     // TODO - Remove this
     fn valid_after_slotted(&self) -> bool {
-        matches!(
-            *self,
-            PseudoElement::Before |
-            PseudoElement::After           
-        )
+        matches!(*self, PseudoElement::Before | PseudoElement::After)
     }
 }

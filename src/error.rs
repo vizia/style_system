@@ -20,7 +20,6 @@ impl<T: fmt::Display> fmt::Display for Error<T> {
 
 impl<T: fmt::Display + fmt::Debug> std::error::Error for Error<T> {}
 
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct ErrorLocation {
     /// The filename in which the error occurred.
@@ -59,7 +58,6 @@ pub struct Location {
     /// Column numbers are counted in UTF-16 code units.
     pub column: u32,
 }
-
 
 #[derive(Debug, PartialEq)]
 pub enum CustomParseError<'i> {

@@ -1,12 +1,11 @@
-
 use parcel_selectors::SelectorList;
 
-use crate::Selectors;
+use crate::{CssRuleList, Location, Selectors};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct StyleRule<'i> {
     pub selectors: SelectorList<'i, Selectors>,
-    pub declarations: DeclarationBlock<'i>,
+    //pub declarations: DeclarationBlock<'i>,
     pub rules: CssRuleList<'i>,
     pub loc: Location,
 }
