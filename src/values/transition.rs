@@ -1,13 +1,14 @@
 use crate::{duration::Duration, CustomParseError, Ident, Parse};
 use cssparser::{ParseError, ParseErrorKind, Parser};
 
+/// Defines a transition that allows to change property values smoothly, over a given duration.
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Transition {
-    /// List of properties affected by transition
+    /// A list of properties affected by transition.
     pub property: String,
-    /// Duration of the transition
+    /// The duration of the transition.
     pub duration: f32,
-    /// Delay of the transition
+    /// The delay of the transition.
     pub delay: Option<f32>,
 }
 
@@ -59,34 +60,33 @@ mod tests {
         }};
     }
 
-    #[test]
-    fn test_success() {
-        assert_parse_value!(
-            Transition,
-            "width 2s",
-            transition!(String::from("width"), 2.0, None)
-        );
+    assert_parse_value! {
+        Transition, transition,
 
-        assert_parse_value!(
-            Transition,
-            "height 2s 1s",
-            transition!(String::from("height"), 2.0, Some(1.0))
-        );
+        success {
+            "width 2s" => transition!(String::from("width"), 2.0, None),
+            "height 2s 1s" => transition!(String::from("height"), 2.0, Some(1.0)),
+        }
 
-        assert_parse_value!(
-            Vec<Transition>,
-            "height 1s 2s, width 3s 4s, rotation 5s 6s",
-            vec![
+        failure {
+            "height 2s 1s 1s",
+            "1s 2s height",
+        }
+    }
+
+    assert_parse_value!(
+        Vec<Transition>, transitions,
+
+        success {
+            "height 1s 2s, width 3s 4s, rotation 5s 6s" => vec![
                 transition!(String::from("height"), 1.0, Some(2.0)),
                 transition!(String::from("width"), 3.0, Some(4.0)),
                 transition!(String::from("rotation"), 5.0, Some(6.0)),
-            ]
-        );
-    }
+            ],
+        }
 
-    #[test]
-    fn test_failure() {
-        assert_parse_value!(Transition, "height 2s 1s 1s");
-        assert_parse_value!(Transition, "1s 2s height");
-    }
+        failure {
+            "height, width, rotation",
+        }
+    );
 }

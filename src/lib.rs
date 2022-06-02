@@ -1,6 +1,3 @@
-mod properties;
-pub use properties::*;
-
 mod values;
 pub use values::*;
 

@@ -1,25 +1,31 @@
 use crate::{
     macros::{impl_from_newtype, impl_parse_try_parse},
-    AbsoluteFontSize, Parse,
+    FontSizeKeyword, Parse,
 };
 
 /// A font size value.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct FontSize(pub f32);
 
-impl_parse_try_parse!(FontSize => AbsoluteFontSize, f32);
-impl_from_newtype!(FontSize => f32);
+impl_parse_try_parse! {
+    FontSize,
+    FontSizeKeyword, f32,
+}
 
-impl From<AbsoluteFontSize> for FontSize {
-    fn from(absolute_font_size: AbsoluteFontSize) -> Self {
+impl_from_newtype! {
+    FontSize(f32),
+}
+
+impl From<FontSizeKeyword> for FontSize {
+    fn from(absolute_font_size: FontSizeKeyword) -> Self {
         match absolute_font_size {
-            AbsoluteFontSize::XXSmall => FontSize(8.0),
-            AbsoluteFontSize::XSmall => FontSize(10.0),
-            AbsoluteFontSize::Small => FontSize(12.0),
-            AbsoluteFontSize::Medium => FontSize(14.0),
-            AbsoluteFontSize::Large => FontSize(16.0),
-            AbsoluteFontSize::XLarge => FontSize(18.0),
-            AbsoluteFontSize::XXLarge => FontSize(20.0),
+            FontSizeKeyword::XXSmall => FontSize(8.0),
+            FontSizeKeyword::XSmall => FontSize(10.0),
+            FontSizeKeyword::Small => FontSize(12.0),
+            FontSizeKeyword::Medium => FontSize(14.0),
+            FontSizeKeyword::Large => FontSize(16.0),
+            FontSizeKeyword::XLarge => FontSize(18.0),
+            FontSizeKeyword::XXLarge => FontSize(20.0),
         }
     }
 }
@@ -27,21 +33,22 @@ impl From<AbsoluteFontSize> for FontSize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::{assert_parse_idents, assert_parse_numbers};
 
-    #[test]
-    fn test_success() {
-        assert_parse_value!(FontSize, "8", FontSize(8.0));
-        assert_parse_value!(FontSize, "10", FontSize(10.0));
-        assert_parse_value!(FontSize, "12", FontSize(12.0));
-        assert_parse_value!(FontSize, "14", FontSize(14.0));
-        assert_parse_value!(FontSize, "16", FontSize(16.0));
+    assert_parse_numbers! {
+        FontSize, font_size_numbers,
+        FontSize,
+    }
 
-        assert_parse_value!(FontSize, "small", FontSize(12.0));
-        assert_parse_value!(FontSize, "medium", FontSize(14.0));
-        assert_parse_value!(FontSize, "large", FontSize(16.0));
+    assert_parse_idents! {
+        FontSize, font_size_idents,
 
-        assert_parse_value!(FontSize, "16.123", FontSize(16.123));
-        assert_parse_value!(FontSize, "0.123", FontSize(0.123));
+        "xx-small" => FontSize(8.0),
+        "x-small" => FontSize(10.0),
+        "small" => FontSize(12.0),
+        "medium" => FontSize(14.0),
+        "large" => FontSize(16.0),
+        "x-large" => FontSize(18.0),
+        "xx-large" => FontSize(20.0),
     }
 }

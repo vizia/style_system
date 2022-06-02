@@ -3,6 +3,8 @@ use cssparser::*;
 
 #[derive(Debug)]
 pub struct StyleSheet {
+    // TODO Use this
+    #[allow(dead_code)]
     rules: Vec<StyleRule>,
 }
 

@@ -3,6 +3,7 @@ pub use morphorm::PositionType;
 
 impl_parse_ident! {
     PositionType,
+
     "self-directed" => PositionType::SelfDirected,
     "parent-directed" => PositionType::ParentDirected,
 }

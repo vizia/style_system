@@ -98,7 +98,10 @@ mod tests {
         let mut parser_input = ParserInput::new(&VALID_BORDER_WIDTH_LENGTH);
         let mut parser = Parser::new(&mut parser_input);
         let result = BorderWidth::parse(&mut parser);
-        assert_eq!(result, Ok(BorderWidth::Length(Length::Value(LengthValue::Px(30.0)))));
+        assert_eq!(
+            result,
+            Ok(BorderWidth::Length(Length::Value(LengthValue::Px(30.0))))
+        );
     }
 
     const VALID_BORDER_WIDTH_THIN: &str = "thin";
@@ -138,12 +141,14 @@ mod tests {
         let mut parser_input = ParserInput::new(&VALID_BORDER);
         let mut parser = Parser::new(&mut parser_input);
         let result = Border::parse(&mut parser);
-        assert_eq!(result, Ok(Border {
-            width: BorderWidth::Length(Length::Value(LengthValue::Px(30.0))),
-            color: Color::RGBA(RGBA::new(255, 0, 0, 255)),
-        }));
+        assert_eq!(
+            result,
+            Ok(Border {
+                width: BorderWidth::Length(Length::Value(LengthValue::Px(30.0))),
+                color: Color::RGBA(RGBA::new(255, 0, 0, 255)),
+            })
+        );
     }
-
 
     const VALID_BORDER_REVERSE: &str = "red 30px";
 
@@ -152,9 +157,12 @@ mod tests {
         let mut parser_input = ParserInput::new(&VALID_BORDER_REVERSE);
         let mut parser = Parser::new(&mut parser_input);
         let result = Border::parse(&mut parser);
-        assert_eq!(result, Ok(Border {
-            width: BorderWidth::Length(Length::Value(LengthValue::Px(30.0))),
-            color: Color::RGBA(RGBA::new(255, 0, 0, 255)),
-        }));
+        assert_eq!(
+            result,
+            Ok(Border {
+                width: BorderWidth::Length(Length::Value(LengthValue::Px(30.0))),
+                color: Color::RGBA(RGBA::new(255, 0, 0, 255)),
+            })
+        );
     }
 }
