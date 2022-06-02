@@ -4,6 +4,7 @@
 
 // Make |cargo bench| work.
 #![cfg_attr(feature = "bench", feature(test))]
+#![allow(unused_imports)]
 
 #[macro_use]
 extern crate bitflags;

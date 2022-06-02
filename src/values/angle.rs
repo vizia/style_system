@@ -1,39 +1,25 @@
-use crate::{Calc, CustomParseError, DimensionPercentage, Parse, TryAdd};
-use cssparser::*;
+use crate::{impl_parse_dimension, Calc, Parse, TryAdd};
 
+/// A value representing an angle expressed in degrees, gradians, radians, or turns.
 #[derive(Debug, Clone)]
 pub enum Angle {
+    /// An angle expressed in degrees.
     Deg(f32),
+    /// An angle expressed in gradians.
     Grad(f32),
+    /// An angle expressed in radians.
     Rad(f32),
+    /// An angle expressed in turns.
     Turn(f32),
 }
 
-impl<'i> Parse<'i> for Angle {
-    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
-        match input.try_parse(Calc::parse) {
-            Ok(Calc::Value(v)) => return Ok(*v),
-            Ok(_) => unreachable!(),
-            _ => {}
-        }
+impl_parse_dimension! {
+    Angle, parse_dimension,
 
-        let location = input.current_source_location();
-        let token = input.next()?;
-        match *token {
-            Token::Dimension {
-                value, ref unit, ..
-            } => {
-                match_ignore_ascii_case! { unit,
-                    "deg" => Ok(Angle::Deg(value)),
-                    "grad" => Ok(Angle::Grad(value)),
-                    "turn" => Ok(Angle::Turn(value)),
-                    "rad" => Ok(Angle::Rad(value)),
-                    _ => return Err(location.new_unexpected_token_error(token.clone())),
-                }
-            }
-            ref token => return Err(location.new_unexpected_token_error(token.clone())),
-        }
-    }
+    "deg" => Angle::Deg,
+    "grad" => Angle::Grad,
+    "Turn" => Angle::Turn,
+    "rad" => Angle::Rad,
 }
 
 impl Angle {
@@ -132,54 +118,5 @@ impl std::cmp::PartialOrd<f32> for Angle {
 impl std::cmp::PartialOrd<Angle> for Angle {
     fn partial_cmp(&self, other: &Angle) -> Option<std::cmp::Ordering> {
         self.to_degrees().partial_cmp(&other.to_degrees())
-    }
-}
-
-// https://drafts.csswg.org/css-values-4/#typedef-angle-percentage
-pub type AnglePercentage = DimensionPercentage<Angle>;
-
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-
-    const VALID_ANGLE_DEG: &str = "30deg";
-
-    #[test]
-    fn parse_angle_deg() {
-        let mut parser_input = ParserInput::new(&VALID_ANGLE_DEG);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = Angle::parse(&mut parser);
-        assert_eq!(result, Ok(Angle::Deg(30.0)));
-    }
-
-    const VALID_ANGLE_GRAD: &str = "30grad";
-
-    #[test]
-    fn parse_angle_grad() {
-        let mut parser_input = ParserInput::new(&VALID_ANGLE_GRAD);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = Angle::parse(&mut parser);
-        assert_eq!(result, Ok(Angle::Grad(30.0)));
-    }
-
-    const VALID_ANGLE_RAD: &str = "30rad";
-
-    #[test]
-    fn parse_angle_rad() {
-        let mut parser_input = ParserInput::new(&VALID_ANGLE_RAD);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = Angle::parse(&mut parser);
-        assert_eq!(result, Ok(Angle::Rad(30.0)));
-    }
-
-    const VALID_ANGLE_TURN: &str = "30turn";
-
-    #[test]
-    fn parse_angle_turn() {
-        let mut parser_input = ParserInput::new(&VALID_ANGLE_TURN);
-        let mut parser = Parser::new(&mut parser_input);
-        let result = Angle::parse(&mut parser);
-        assert_eq!(result, Ok(Angle::Turn(30.0)));
     }
 }

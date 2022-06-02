@@ -1,6 +1,9 @@
 use crate::{CustomParseError, Parse};
 use cssparser::{ParseError, Parser};
 
+/// Describes four sides of a rectangle.
+///
+/// It is for example used for [`Overflow`](crate::Overflow) or [`BorderRadius`](crate::BorderRadius).
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Rect<T>(
     /// The first value.
@@ -55,17 +58,19 @@ mod tests {
     use super::*;
     use crate::tests::assert_parse_value;
 
-    #[test]
-    fn test_sucess() {
-        assert_parse_value!(Rect<u8>, "1", Rect(1, 1, 1, 1));
-        assert_parse_value!(Rect<u8>, "1 2", Rect(1, 2, 1, 2));
-        assert_parse_value!(Rect<u8>, "1 2 3", Rect(1, 2, 3, 2));
-        assert_parse_value!(Rect<u8>, "1 2 3 4", Rect(1, 2, 3, 4));
-    }
+    assert_parse_value! {
+        Rect<u8>, rect,
 
-    #[test]
-    fn test_failure() {
-        assert_parse_value!(Rect<u8>, "1 2 3 4 5");
-        assert_parse_value!(Rect<u8>, "abc");
+        success {
+            "1" => Rect(1, 1, 1, 1),
+            "1 2" => Rect(1, 2, 1, 2),
+            "1 2 3" => Rect(1, 2, 3, 2),
+            "1 2 3 4" => Rect(1, 2, 3, 4),
+        }
+
+        failure {
+            "1 2 3 4 5",
+            "test",
+        }
     }
 }

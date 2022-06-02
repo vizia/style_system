@@ -19,7 +19,4 @@ impl<'i> parcel_selectors::parser::PseudoElement<'i> for PseudoElement<'i> {
     fn valid_after_slotted(&self) -> bool {
         false
     }
-
-    
-
 }

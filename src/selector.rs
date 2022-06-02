@@ -1,7 +1,7 @@
 use cssparser::*;
-use parcel_selectors::{SelectorImpl, parser::Selector};
+use parcel_selectors::SelectorImpl;
 
-use crate::{PseudoClass, PseudoElement, CustomParseError, pseudoclass};
+use crate::{CustomParseError, PseudoClass, PseudoElement};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Selectors;
@@ -9,13 +9,11 @@ pub struct Selectors;
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct SelectorString<'a>(pub CowRcStr<'a>);
 
-
 impl<'a> std::convert::From<CowRcStr<'a>> for SelectorString<'a> {
     fn from(s: CowRcStr<'a>) -> SelectorString<'a> {
         SelectorString(s.into())
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Hash)]
 pub struct SelectorIdent<'i>(pub CowRcStr<'i>);
@@ -26,7 +24,6 @@ impl<'a> std::convert::From<CowRcStr<'a>> for SelectorIdent<'a> {
     }
 }
 
-
 impl<'i> SelectorImpl<'i> for Selectors {
     type AttrValue = SelectorString<'i>;
     type Identifier = SelectorIdent<'i>;
@@ -35,10 +32,10 @@ impl<'i> SelectorImpl<'i> for Selectors {
     type NamespaceUrl = SelectorIdent<'i>;
     type BorrowedNamespaceUrl = SelectorIdent<'i>;
     type BorrowedLocalName = SelectorIdent<'i>;
-  
+
     type NonTSPseudoClass = PseudoClass<'i>;
     type PseudoElement = PseudoElement<'i>;
-  
+
     type ExtraMatchingData = ();
 }
 
@@ -76,13 +73,12 @@ impl<'i> parcel_selectors::parser::Parser<'i> for SelectorParser {
             "user-invalid" => UserInvalid,
 
             _ => Custom(name.into())
-        
+
         };
 
         Ok(pseudo_class)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -98,7 +94,11 @@ mod tests {
     fn parse_element_selector() {
         let mut parser_input = ParserInput::new(&VALID_ELEMENT_SELECTOR);
         let mut parser = Parser::new(&mut parser_input);
-        let result = SelectorList::parse(&SelectorParser, &mut parser, parcel_selectors::parser::NestingRequirement::None);
+        let result = SelectorList::parse(
+            &SelectorParser,
+            &mut parser,
+            parcel_selectors::parser::NestingRequirement::None,
+        );
         println!("{:?}", result.is_ok());
         //assert_eq!(3, result);
     }

@@ -127,7 +127,9 @@ impl<
             + std::fmt::Debug,
     > Calc<V>
 {
-    fn parse_sum<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
+    fn parse_sum<'t>(
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
         let mut cur: Calc<V> = Calc::parse_product(input)?;
         loop {
             let start = input.state();

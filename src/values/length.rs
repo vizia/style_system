@@ -1,8 +1,11 @@
-use super::calc::Calc;
-use super::percentage::DimensionPercentage;
-use crate::error::CustomParseError;
-use crate::traits::{Parse, TryAdd};
-use crate::{impl_parse_try_parse, LengthValue};
+use crate::{
+    calc::Calc,
+    dimension_percentage::DimensionPercentage,
+    error::CustomParseError,
+    impl_parse_try_parse,
+    traits::{Parse, TryAdd},
+    LengthValue,
+};
 use cssparser::*;
 
 /// https://drafts.csswg.org/css-values-4/#typedef-length-percentage
@@ -237,7 +240,10 @@ impl Default for LengthOrNumber {
     }
 }
 
-impl_parse_try_parse!(LengthOrNumber => f32, Length);
+impl_parse_try_parse! {
+    LengthOrNumber,
+    f32, Length,
+}
 
 impl From<f32> for LengthOrNumber {
     fn from(number: f32) -> Self {

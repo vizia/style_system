@@ -70,7 +70,8 @@ pub enum LengthValue {
 }
 
 impl_parse_dimension! {
-    LengthValue,
+    LengthValue, length_value,
+
     "px" => LengthValue::Px,
     "in" => LengthValue::In,
     "cm" => LengthValue::Cm,
@@ -90,22 +91,22 @@ impl_parse_dimension! {
 
 impl LengthValue {
     /// The amount of pixels per inch.
-    const PX_PER_IN: f32 = 96.0;
+    pub const PX_PER_IN: f32 = 96.0;
 
     /// The amount of pixels per centimeter.
-    const PX_PER_CM: f32 = Self::PX_PER_IN / 2.54;
+    pub const PX_PER_CM: f32 = Self::PX_PER_IN / 2.54;
 
     /// The amount of pixels per millimeter.
-    const PX_PER_MM: f32 = Self::PX_PER_CM / 10.0;
+    pub const PX_PER_MM: f32 = Self::PX_PER_CM / 10.0;
 
     /// The amount of pixels per quarter-millimeter.
-    const PX_PER_Q: f32 = Self::PX_PER_CM / 40.0;
+    pub const PX_PER_Q: f32 = Self::PX_PER_CM / 40.0;
 
     /// The amount of pixels per point.
-    const PX_PER_PT: f32 = Self::PX_PER_IN / 72.0;
+    pub const PX_PER_PT: f32 = Self::PX_PER_IN / 72.0;
 
     /// The amount of pixels per pica.
-    const PX_PER_PC: f32 = Self::PX_PER_IN / 6.0;
+    pub const PX_PER_PC: f32 = Self::PX_PER_IN / 6.0;
 
     /// Returns the amount of pixels of the length if calculateable.
     pub fn to_px(&self) -> Option<f32> {
