@@ -17,7 +17,28 @@ macro_rules! define_enum_value {
             )+
         }
 
-        $crate::impl_parse_ident!($name, $($str => $name::$id,)+);
+        $crate::impl_parse! {
+            $name,
+
+            tokens {
+                ident {
+                    $($str => $name::$id,)+
+                }
+            }
+        }
+
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+
+            $crate::tests::assert_parse! {
+                $name, assert_parse,
+
+                ident {
+                    $($str => $name::$id,)+
+                }
+            }
+        }
   };
 }
 

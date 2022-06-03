@@ -1,46 +1,9 @@
 use crate::{
     calc::Calc,
-    dimension_percentage::DimensionPercentage,
-    error::CustomParseError,
-    impl_parse_try_parse,
+    impl_parse,
     traits::{Parse, TryAdd},
     LengthValue,
 };
-use cssparser::*;
-
-/// https://drafts.csswg.org/css-values-4/#typedef-length-percentage
-pub type LengthPercentage = DimensionPercentage<LengthValue>;
-
-impl LengthPercentage {
-    pub fn zero() -> LengthPercentage {
-        LengthPercentage::px(0.0)
-    }
-
-    pub fn px(val: f32) -> LengthPercentage {
-        LengthPercentage::Dimension(LengthValue::Px(val))
-    }
-}
-
-/// `<length-percentage> | auto`
-#[derive(Debug, Clone, PartialEq)]
-pub enum LengthPercentageOrAuto {
-    Auto,
-    LengthPercentage(LengthPercentage),
-}
-
-impl<'i> Parse<'i> for LengthPercentageOrAuto {
-    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
-        if input.try_parse(|i| i.expect_ident_matching("auto")).is_ok() {
-            return Ok(LengthPercentageOrAuto::Auto);
-        }
-
-        if let Ok(percent) = input.try_parse(|input| LengthPercentage::parse(input)) {
-            return Ok(LengthPercentageOrAuto::LengthPercentage(percent));
-        }
-
-        Err(input.new_error_for_next_token())
-    }
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Length {
@@ -48,16 +11,20 @@ pub enum Length {
     Calc(Box<Calc<Length>>),
 }
 
-impl<'i> Parse<'i> for Length {
-    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
-        match input.try_parse(Calc::parse) {
-            Ok(Calc::Value(v)) => return Ok(*v),
-            Ok(calc) => return Ok(Length::Calc(Box::new(calc))),
-            _ => {}
-        }
+impl_parse! {
+    Length,
 
-        let len = LengthValue::parse(input)?;
-        Ok(Length::Value(len))
+    custom {
+        |input| {
+            match input.try_parse(Calc::parse) {
+                Ok(Calc::Value(v)) => return Ok(*v),
+                Ok(calc) => return Ok(Length::Calc(Box::new(calc))),
+                _ => {}
+            }
+
+            let len = LengthValue::parse(input)?;
+            Ok(Length::Value(len))
+        }
     }
 }
 
@@ -227,67 +194,3 @@ impl std::cmp::PartialOrd<Length> for Length {
         }
     }
 }
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum LengthOrNumber {
-    Length(Length),
-    Number(f32),
-}
-
-impl Default for LengthOrNumber {
-    fn default() -> LengthOrNumber {
-        LengthOrNumber::Number(0.0)
-    }
-}
-
-impl_parse_try_parse! {
-    LengthOrNumber,
-    f32, Length,
-}
-
-impl From<f32> for LengthOrNumber {
-    fn from(number: f32) -> Self {
-        Self::Number(number)
-    }
-}
-
-impl From<Length> for LengthOrNumber {
-    fn from(length: Length) -> Self {
-        Self::Length(length)
-    }
-}
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     const VALID_LENGTH_VALUE_PX: &str = "100px";
-
-//     #[test]
-//     fn parse_length_value_px() {
-//         let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_PX);
-//         let mut parser = Parser::new(&mut parser_input);
-//         let result = LengthValue::parse(&mut parser);
-//         assert_eq!(result, Ok(LengthValue::Px(100.0)));
-//     }
-
-//     const VALID_LENGTH_VALUE_IN: &str = "100in";
-
-//     #[test]
-//     fn parse_length_value_in() {
-//         let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_IN);
-//         let mut parser = Parser::new(&mut parser_input);
-//         let result = LengthValue::parse(&mut parser);
-//         assert_eq!(result, Ok(LengthValue::In(100.0)));
-//     }
-
-//     const VALID_LENGTH_VALUE_CM: &str = "100cm";
-
-//     #[test]
-//     fn parse_length_value_cm() {
-//         let mut parser_input = ParserInput::new(&VALID_LENGTH_VALUE_CM);
-//         let mut parser = Parser::new(&mut parser_input);
-//         let result = LengthValue::parse(&mut parser);
-//         assert_eq!(result, Ok(LengthValue::Cm(100.0)));
-//     }
-// }

@@ -1,10 +1,14 @@
-use crate::{impl_parse_ident, Parse};
+use crate::{impl_parse, Parse};
 pub use morphorm::LayoutType;
 
-impl_parse_ident! {
+impl_parse! {
     LayoutType,
 
-    "row" => LayoutType::Row,
-    "column" => LayoutType::Column,
-    "grid" => LayoutType::Grid,
+    tokens {
+        ident {
+            "row" => LayoutType::Row,
+            "column" => LayoutType::Column,
+            "grid" => LayoutType::Grid,
+        }
+    }
 }

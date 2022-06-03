@@ -1,9 +1,13 @@
-use crate::{impl_parse_ident, Parse};
+use crate::{impl_parse, Parse};
 pub use morphorm::PositionType;
 
-impl_parse_ident! {
+impl_parse! {
     PositionType,
 
-    "self-directed" => PositionType::SelfDirected,
-    "parent-directed" => PositionType::ParentDirected,
+    tokens {
+        ident {
+            "self-directed" => PositionType::SelfDirected,
+            "parent-directed" => PositionType::ParentDirected,
+        }
+    }
 }

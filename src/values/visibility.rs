@@ -1,4 +1,4 @@
-use crate::{macros::define_enum_value, Parse};
+use crate::{impl_from, macros::define_enum_value, Parse};
 
 define_enum_value! {
     /// Determines whether an entity will be rendered.
@@ -13,13 +13,11 @@ define_enum_value! {
     }
 }
 
-impl From<bool> for Visibility {
-    fn from(val: bool) -> Self {
-        if val {
-            Visibility::Visible
-        } else {
-            Visibility::Invisible
-        }
+impl_from! {
+    Visibility,
+
+    from {
+        bool => |x| if x { Visibility::Visible } else { Visibility::Invisible },
     }
 }
 

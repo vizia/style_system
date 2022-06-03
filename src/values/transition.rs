@@ -48,7 +48,7 @@ impl<'i> Parse<'i> for Vec<Transition> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::assert_parse;
 
     macro_rules! transition {
         ($property: expr, $duration: expr, $delay: expr$(,)?) => {{
@@ -60,7 +60,7 @@ mod tests {
         }};
     }
 
-    assert_parse_value! {
+    assert_parse! {
         Transition, transition,
 
         success {
@@ -74,7 +74,7 @@ mod tests {
         }
     }
 
-    assert_parse_value!(
+    assert_parse!(
         Vec<Transition>, transitions,
 
         success {

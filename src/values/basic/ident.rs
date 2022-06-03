@@ -1,27 +1,40 @@
 use crate::{
-    macros::{impl_from_newtype, impl_parse_expect},
+    macros::{impl_from, impl_parse},
     Parse,
 };
 
-/// A simple ident stored.
+/// A simple ident.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Ident(pub String);
 
-impl_parse_expect! {
+impl_parse! {
     Ident,
-    cssparser::Token::Ident(ident) => ident.as_ref().to_owned().into(),
+
+    tokens {
+        custom {
+            cssparser::Token::Ident(ident) => ident.as_ref().to_owned().into(),
+        }
+    }
 }
 
-impl_from_newtype! {
-    Ident(String),
+impl_from! {
+    Ident,
+
+    from {
+        String => |x| Ident(x),
+    }
+
+    into {
+        String => |x: Ident| x.0,
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::assert_parse;
 
-    assert_parse_value! {
+    assert_parse! {
         Ident, ident,
 
         success {
