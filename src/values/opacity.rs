@@ -1,35 +1,48 @@
 use crate::{
-    macros::{impl_from_newtype, impl_parse_try_parse},
-    percentage::Percentage,
-    Parse,
+    macros::{impl_from, impl_parse},
+    Parse, Percentage,
 };
 
 /// An opacity value in the range of 0 to 1.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Opacity(pub f32);
 
-impl_parse_try_parse! {
+impl_parse! {
     Opacity,
-    Percentage, f32,
+
+    try_parse {
+        Percentage,
+        f32,
+    }
 }
 
-impl_from_newtype! {
-    Opacity(f32),
-    Percentage,
+impl_from! {
+    Opacity,
+
+    from {
+        f32 => |x| Opacity(x),
+        Percentage => |x: Percentage| Opacity(x.0),
+    }
+
+    into {
+        f32 => |x: Opacity| x.0,
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse_numbers, assert_parse_percentages};
+    use crate::tests::assert_parse;
 
-    assert_parse_percentages! {
-        Opacity, parse_percentages,
-        Opacity,
-    }
+    assert_parse! {
+        Opacity, opacity,
 
-    assert_parse_numbers! {
-        Opacity, parse_numbers,
-        Opacity,
+        number {
+            Opacity,
+        }
+
+        percentage {
+            Opacity,
+        }
     }
 }

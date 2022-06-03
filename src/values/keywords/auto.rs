@@ -1,4 +1,4 @@
-use crate::{impl_parse_ident, Parse};
+use crate::{impl_parse, Parse};
 
 /// The 'auto' keyword.
 ///
@@ -6,8 +6,12 @@ use crate::{impl_parse_ident, Parse};
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct AutoKeyword;
 
-impl_parse_ident! {
+impl_parse! {
     AutoKeyword,
 
-    "auto" => AutoKeyword,
+    tokens {
+        ident {
+            "auto" => AutoKeyword,
+        }
+    }
 }

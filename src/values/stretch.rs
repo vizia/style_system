@@ -1,18 +1,27 @@
-use crate::{
-    macros::{impl_from_newtype, impl_parse_dimension},
-    Parse,
-};
+use crate::{impl_parse, macros::impl_from, Parse};
 
 /// A factor of the remaining free space.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Stretch(pub f32);
 
-impl_parse_dimension! {
-    Stretch, stretch,
+impl_parse! {
+    Stretch,
 
-    "st" => Stretch,
+    tokens {
+        dimension {
+            "st" => Stretch,
+        }
+    }
 }
 
-impl_from_newtype! {
-    Stretch(f32),
+impl_from! {
+    Stretch,
+
+    from {
+        f32 => |x| Stretch(x),
+    }
+
+    into {
+        f32 => |x: Stretch| x.0,
+    }
 }

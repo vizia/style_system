@@ -1,4 +1,4 @@
-use crate::{impl_parse_dimension, Calc, Parse, TryAdd};
+use crate::{impl_from, impl_parse, Calc, Parse, TryAdd};
 
 /// A value representing an angle expressed in degrees, gradians, radians, or turns.
 #[derive(Debug, Clone)]
@@ -13,13 +13,17 @@ pub enum Angle {
     Turn(f32),
 }
 
-impl_parse_dimension! {
-    Angle, parse_dimension,
+impl_parse! {
+    Angle,
 
-    "deg" => Angle::Deg,
-    "grad" => Angle::Grad,
-    "Turn" => Angle::Turn,
-    "rad" => Angle::Rad,
+    tokens {
+        dimension {
+            "deg" => Angle::Deg,
+            "grad" => Angle::Grad,
+            "Turn" => Angle::Turn,
+            "rad" => Angle::Rad,
+        }
+    }
 }
 
 impl Angle {
@@ -51,18 +55,15 @@ impl Angle {
     }
 }
 
-impl std::convert::Into<Calc<Angle>> for Angle {
-    fn into(self) -> Calc<Angle> {
-        Calc::Value(Box::new(self))
-    }
-}
+impl_from! {
+    Angle,
 
-impl std::convert::From<Calc<Angle>> for Angle {
-    fn from(calc: Calc<Angle>) -> Angle {
-        match calc {
-            Calc::Value(v) => *v,
-            _ => unreachable!(),
-        }
+    from {
+        Calc<Angle> => |x| match x { Calc::Value(v) => *v, _ => unreachable!(), },
+    }
+
+    into {
+        Calc<Angle> => |x| Calc::Value(Box::new(x)),
     }
 }
 

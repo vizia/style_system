@@ -1,12 +1,16 @@
-use crate::{macros::impl_parse_ident, Parse};
+use crate::{macros::impl_parse, Parse};
 
-impl_parse_ident! {
+impl_parse! {
     bool,
 
-    "on" => true,
-    "off" => false,
-    "true" => true,
-    "false" => false,
-    "yes" => true,
-    "no" => false,
+    tokens {
+        ident {
+            "on" => true,
+            "off" => false,
+            "true" => true,
+            "false" => false,
+            "yes" => true,
+            "no" => false,
+        }
+    }
 }

@@ -1,4 +1,4 @@
-use crate::{impl_parse_dimension, Parse, TryAdd};
+use crate::{impl_parse, Parse, TryAdd};
 
 /// A length value.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -69,24 +69,28 @@ pub enum LengthValue {
     Vmax(f32),
 }
 
-impl_parse_dimension! {
-    LengthValue, length_value,
+impl_parse! {
+    LengthValue,
 
-    "px" => LengthValue::Px,
-    "in" => LengthValue::In,
-    "cm" => LengthValue::Cm,
-    "mm" => LengthValue::Mm,
-    "q" => LengthValue::Q,
-    "pt" => LengthValue::Pt,
-    "pc" => LengthValue::Pc,
-    "em" => LengthValue::Em,
-    "ex" => LengthValue::Ex,
-    "ch" => LengthValue::Ch,
-    "rem" => LengthValue::Rem,
-    "vw" => LengthValue::Vw,
-    "vh" => LengthValue::Vh,
-    "vmin" => LengthValue::Vmin,
-    "vmax" => LengthValue::Vmax,
+    tokens {
+        dimension {
+            "px" => LengthValue::Px,
+            "in" => LengthValue::In,
+            "cm" => LengthValue::Cm,
+            "mm" => LengthValue::Mm,
+            "q" => LengthValue::Q,
+            "pt" => LengthValue::Pt,
+            "pc" => LengthValue::Pc,
+            "em" => LengthValue::Em,
+            "ex" => LengthValue::Ex,
+            "ch" => LengthValue::Ch,
+            "rem" => LengthValue::Rem,
+            "vw" => LengthValue::Vw,
+            "vh" => LengthValue::Vh,
+            "vmin" => LengthValue::Vmin,
+            "vmax" => LengthValue::Vmax,
+        }
+    }
 }
 
 impl LengthValue {

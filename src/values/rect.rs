@@ -56,9 +56,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::assert_parse;
 
-    assert_parse_value! {
+    assert_parse! {
         Rect<u8>, rect,
 
         success {

@@ -1,4 +1,4 @@
-use crate::{macros::impl_parse_try_parse, Parse};
+use crate::{macros::impl_parse, Parse};
 
 /// A color value.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -9,9 +9,12 @@ pub enum Color {
     RGBA(RGBA),
 }
 
-impl_parse_try_parse! {
+impl_parse! {
     Color,
-    cssparser::Color,
+
+    try_parse {
+        cssparser::Color,
+    }
 }
 
 impl From<cssparser::Color> for Color {
@@ -20,6 +23,12 @@ impl From<cssparser::Color> for Color {
             cssparser::Color::CurrentColor => Color::CurrentColor,
             cssparser::Color::RGBA(rgba) => Color::RGBA(rgba.into()),
         }
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self::CurrentColor
     }
 }
 
@@ -274,9 +283,9 @@ fn hue(mut h: f32, m1: f32, m2: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::assert_parse;
 
-    assert_parse_value! {
+    assert_parse! {
         Color, color,
 
         success {

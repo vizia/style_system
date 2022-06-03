@@ -1,5 +1,5 @@
 use crate::{
-    macros::{impl_from_newtype, impl_parse_dimension},
+    macros::{impl_from, impl_parse},
     Parse,
 };
 
@@ -9,13 +9,25 @@ use crate::{
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Duration(pub f32);
 
-impl_parse_dimension! {
-    Duration, duration,
+impl_parse! {
+    Duration,
 
-    "s" => Duration,
-    "ms" => Duration(0.001),
+    tokens {
+        dimension {
+            "s" => Duration,
+            "ms" => Duration(0.001),
+        }
+    }
 }
 
-impl_from_newtype! {
-    Duration(f32),
+impl_from! {
+    Duration,
+
+    from {
+        f32 => |x| Duration(x),
+    }
+
+    into {
+        f32 => |x: Duration| x.0,
+    }
 }

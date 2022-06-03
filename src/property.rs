@@ -1,8 +1,8 @@
 use crate::{
-    border_corner_shape::BorderCornerShape, box_shadow::BoxShadow, color::Color,
-    cursor_icon::CursorIcon, display::Display, layout_type::LayoutType, macros::define_property,
-    overflow::Overflow, position_type::PositionType, transition::Transition, units::Units,
-    visibility::Visibility, BorderRadius, CustomParseError, FontSize, Length, Opacity, Parse,
+    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderStyle, BorderStyleKeyword,
+    BorderWidth, BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, Display,
+    FontSize, LayoutType, Length, Opacity, Overflow, Parse, PositionType, Transition, Units,
+    Visibility,
 };
 use cssparser::Parser;
 
@@ -13,6 +13,8 @@ define_property! {
         "visibility": Visibility(Visibility),
         "overflow": Overflow(Overflow),
         "opacity": Opacity(Opacity),
+
+        // ----- Layout -----
 
         // Positioning
         "layout-type": LayoutType(LayoutType),
@@ -51,6 +53,23 @@ define_property! {
         "row-between": RowBetween(Units),
         "col-between": ColBetween(Units),
 
+
+        // ----- Border -----
+
+        // Border Color
+        "border-color": BorderColor(BorderColor),
+        "border-top-color": BorderTopColor(Color),
+        "border-right-color": BorderRightColor(Color),
+        "border-bottom-color": BorderBottomColor(Color),
+        "border-left-color": BorderLeftColor(Color),
+
+        // Border Corner Shape
+        "border-corner-shape": BorderCornerShape(BorderCornerShape),
+        "border-top-left-shape": BorderTopLeftShape(BorderCornerShape),
+        "border-top-right-shape": BorderTopRightShape(BorderCornerShape),
+        "border-bottom-left-shape": BorderBottomLeftShape(BorderCornerShape),
+        "border-bottom-right-shape": BorderBottomRightShape(BorderCornerShape),
+
         // Border Radius
         "border-radius": BorderRadius(BorderRadius),
         "border-top-left-radius": BorderTopLeftRadius(Length),
@@ -58,18 +77,20 @@ define_property! {
         "border-bottom-left-radius": BorderBottomLeftRadius(Length),
         "border-bottom-right-radius": BorderBottomRightRadius(Length),
 
+        // Border Style
+        "border-style": BorderStyle(BorderStyle),
+        "border-top-style": BorderTopStyle(BorderStyleKeyword),
+        "border-right-style": BorderRightStyle(BorderStyleKeyword),
+        "border-bottom-style": BorderBottomStyle(BorderStyleKeyword),
+        "border-left-style": BorderLeftStyle(BorderStyleKeyword),
+
         // Border Width
-        "border-width": BorderWidth(Length),
+        "border-width": BorderWidth(BorderWidth),
+        "border-top-width": BorderTopWidth(BorderWidthValue),
+        "border-right-width": BorderRightWidth(BorderWidthValue),
+        "border-bottom-width": BorderBottomWidth(BorderWidthValue),
+        "border-left-width": BorderLeftWidth(BorderWidthValue),
 
-        // Border Color
-        "border-color": BorderColor(Color),
-
-        // Border Shape
-        "border-corner-shape": BorderCornerShape(BorderCornerShape),
-        "border-top-left-shape": BorderTopLeftShape(BorderCornerShape),
-        "border-top-right-shape": BorderTopRightShape(BorderCornerShape),
-        "border-bottom-left-shape": BorderBottomLeftShape(BorderCornerShape),
-        "border-bottom-right-shape": BorderBottomRightShape(BorderCornerShape),
 
         // Background
         "background-color": BackgroundColor(Color),
