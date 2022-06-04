@@ -25,3 +25,17 @@ impl_from! {
         f32 => |x: Stretch| x.0,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        Stretch, assert_stretch,
+
+        dimension {
+            "st" => Stretch,
+        }
+    }
+}

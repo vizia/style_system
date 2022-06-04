@@ -67,7 +67,7 @@ mod tests {
     use crate::tests::assert_parse;
 
     assert_parse! {
-        Percentage, percentages,
+        Percentage, assert_percentage,
 
         percentage {
             Percentage,

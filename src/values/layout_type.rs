@@ -12,3 +12,19 @@ impl_parse! {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        LayoutType, assert_layout_type,
+
+        ident {
+            "row" => LayoutType::Row,
+            "column" => LayoutType::Column,
+            "grid" => LayoutType::Grid,
+        }
+    }
+}

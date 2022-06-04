@@ -1,6 +1,6 @@
-use crate::{macros::define_enum_value, Parse};
+use crate::{macros::define_enum, Parse};
 
-define_enum_value! {
+define_enum! {
     /// The shape the default view drawing algorithm should use for handling borders.
     pub enum BorderCornerShape {
         /// The round border corner shape.

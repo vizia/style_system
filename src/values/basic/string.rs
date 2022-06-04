@@ -17,18 +17,20 @@ mod tests {
     use crate::tests::assert_parse;
 
     assert_parse! {
-        String, string,
+        String, assert_string,
 
-        success {
-            r#""test""# => String::from("test"),
-            r#"'test'"# => String::from("test"),
-            r#""abc"def"ghi""# => String::from("abc"),
-            r#""a b c d e f g""# => String::from("a b c d e f g"),
-        }
+        custom {
+            success {
+                r#""test""# => String::from("test"),
+                r#"'test'"# => String::from("test"),
+                r#""abc"def"ghi""# => String::from("abc"),
+                r#""a b c d e f g""# => String::from("a b c d e f g"),
+            }
 
-        failure {
-            "test",
-            "123",
+            failure {
+                "test",
+                "123",
+            }
         }
     }
 }

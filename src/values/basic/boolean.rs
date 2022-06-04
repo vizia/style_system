@@ -14,3 +14,22 @@ impl_parse! {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        bool, assert_boolean,
+
+        ident {
+            "on" => true,
+            "off" => false,
+            "true" => true,
+            "false" => false,
+            "yes" => true,
+            "no" => false,
+        }
+    }
+}

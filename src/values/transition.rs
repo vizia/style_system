@@ -48,45 +48,39 @@ impl<'i> Parse<'i> for Vec<Transition> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse;
-
-    macro_rules! transition {
-        ($property: expr, $duration: expr, $delay: expr$(,)?) => {{
-            Transition {
-                property: $property,
-                duration: $duration,
-                delay: $delay,
-            }
-        }};
-    }
+    use crate::tests::{assert_parse, transition};
 
     assert_parse! {
-        Transition, transition,
+        Transition, assert_transition,
 
-        success {
-            "width 2s" => transition!(String::from("width"), 2.0, None),
-            "height 2s 1s" => transition!(String::from("height"), 2.0, Some(1.0)),
-        }
+        custom {
+            success {
+                "width 2s" => transition!(String::from("width"), 2.0, None),
+                "height 2s 1s" => transition!(String::from("height"), 2.0, Some(1.0)),
+            }
 
-        failure {
-            "height 2s 1s 1s",
-            "1s 2s height",
+            failure {
+                "height 2s 1s 1s",
+                "1s 2s height",
+            }
         }
     }
 
     assert_parse!(
-        Vec<Transition>, transitions,
+        Vec<Transition>, assert_transitions,
 
-        success {
-            "height 1s 2s, width 3s 4s, rotation 5s 6s" => vec![
-                transition!(String::from("height"), 1.0, Some(2.0)),
-                transition!(String::from("width"), 3.0, Some(4.0)),
-                transition!(String::from("rotation"), 5.0, Some(6.0)),
-            ],
-        }
+        custom {
+            success {
+                "height 1s 2s, width 3s 4s, rotation 5s 6s" => vec![
+                    transition!(String::from("height"), 1.0, Some(2.0)),
+                    transition!(String::from("width"), 3.0, Some(4.0)),
+                    transition!(String::from("rotation"), 5.0, Some(6.0)),
+                ],
+            }
 
-        failure {
-            "height, width, rotation",
+            failure {
+                "height, width, rotation",
+            }
         }
     );
 }

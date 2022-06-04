@@ -1,6 +1,6 @@
-use crate::{define_enum_value, Parse};
+use crate::{define_enum, Parse};
 
-define_enum_value! {
+define_enum! {
     /// The keyword of a single border style.
     pub enum BorderStyleKeyword {
         /// Specifies no border.

@@ -37,24 +37,10 @@ impl_from! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse;
-
-    macro_rules! border_radius {
-        ($top_left: expr, $top_right: expr, $bottom_right: expr, $bottom_left: expr) => {{
-            use $crate::Length::*;
-            use $crate::LengthValue::*;
-
-            BorderRadius {
-                top_left: Value($top_left),
-                top_right: Value($top_right),
-                bottom_right: Value($bottom_right),
-                bottom_left: Value($bottom_left),
-            }
-        }};
-    }
+    use crate::tests::{assert_parse, border_radius};
 
     assert_parse! {
-        BorderRadius, border_radius,
+        BorderRadius, assert_border_radius,
 
         success {
             "10px" => border_radius!(Px(10.0), Px(10.0), Px(10.0), Px(10.0)),
