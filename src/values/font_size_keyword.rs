@@ -1,6 +1,6 @@
-use crate::{macros::define_enum_value, Parse};
+use crate::{macros::define_enum, Parse};
 
-define_enum_value! {
+define_enum! {
     /// A font size keyword corresponding to a specific font size.
     pub enum FontSizeKeyword {
         /// Corresponds to the font size 8.

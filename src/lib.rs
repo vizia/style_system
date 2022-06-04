@@ -11,7 +11,7 @@ mod property;
 pub use property::*;
 
 mod macros;
-pub use macros::*;
+pub(crate) use macros::*;
 
 mod error;
 pub use error::*;

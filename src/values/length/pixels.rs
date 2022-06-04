@@ -23,3 +23,23 @@ impl_parse! {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{tests::assert_parse, LengthValue};
+
+    assert_parse! {
+        LengthPixels, assert_length_pixels,
+
+        dimension {
+            "px" => LengthPixels,
+            "in" => LengthPixels(LengthValue::PX_PER_IN),
+            "cm" => LengthPixels(LengthValue::PX_PER_CM),
+            "mm" => LengthPixels(LengthValue::PX_PER_MM),
+            "q" => LengthPixels(LengthValue::PX_PER_Q),
+            "pt" => LengthPixels(LengthValue::PX_PER_PT),
+            "pc" => LengthPixels(LengthValue::PX_PER_PC),
+        }
+    }
+}

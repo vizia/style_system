@@ -1,4 +1,4 @@
-macro_rules! define_enum_value {
+macro_rules! define_enum {
     (
         $(#[$outer:meta])*
         $vis:vis enum $name:ident {
@@ -80,5 +80,5 @@ macro_rules! define_property {
     };
 }
 
-pub(crate) use define_enum_value;
+pub(crate) use define_enum;
 pub(crate) use define_property;

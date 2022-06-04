@@ -35,19 +35,21 @@ mod tests {
     use crate::tests::assert_parse;
 
     assert_parse! {
-        Ident, ident,
+        Ident, assert_ident,
 
-        success {
-            "ident" => Ident(String::from("ident")),
-            "border" => Ident(String::from("border")),
-            "color" => Ident(String::from("color")),
-            "yes" => Ident(String::from("yes")),
-            "no" => Ident(String::from("no")),
-        }
+        custom {
+            success {
+                "ident" => Ident(String::from("ident")),
+                "border" => Ident(String::from("border")),
+                "color" => Ident(String::from("color")),
+                "yes" => Ident(String::from("yes")),
+                "no" => Ident(String::from("no")),
+            }
 
-        failure {
-            "123",
-            "123ident",
+            failure {
+                "123",
+                "123ident",
+            }
         }
     }
 }

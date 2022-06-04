@@ -1,6 +1,6 @@
-use crate::{macros::define_enum_value, Parse};
+use crate::{macros::define_enum, Parse};
 
-define_enum_value! {
+define_enum! {
     /// An icon of a cursor.
     pub enum CursorIcon {
         /// The platform-dependent default cursor. Typically an arrow.

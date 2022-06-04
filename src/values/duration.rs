@@ -31,3 +31,18 @@ impl_from! {
         f32 => |x: Duration| x.0,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        Duration, assert_duration,
+
+        dimension {
+            "s" => Duration,
+            "ms" => Duration(0.001),
+        }
+    }
+}

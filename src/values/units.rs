@@ -29,7 +29,7 @@ mod tests {
     use crate::{tests::assert_parse, LengthValue};
 
     assert_parse! {
-        Units, units,
+        Units, parse_units,
 
         ident {
             "auto" => Units::Auto,

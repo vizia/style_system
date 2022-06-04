@@ -33,3 +33,28 @@ impl_from! {
         },
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::{assert_parse, border_style};
+
+    assert_parse! {
+        BorderStyle, assert_border_style,
+
+        custom {
+            success {
+                "none" => border_style!(None, None, None, None),
+                "none solid" => border_style!(None, Solid, None, Solid),
+                "none solid dashed" => border_style!(None, Solid, Dashed, Solid),
+                "none solid dashed groove" => border_style!(None, Solid, Dashed, Groove),
+            }
+
+            failure {
+                "test",
+                "123",
+                "none solid dashed groove dotted",
+            }
+        }
+    }
+}

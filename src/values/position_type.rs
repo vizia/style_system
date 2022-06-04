@@ -11,3 +11,18 @@ impl_parse! {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        PositionType, assert_position_type,
+
+        ident {
+            "self-directed" => PositionType::SelfDirected,
+            "parent-directed" => PositionType::ParentDirected,
+        }
+    }
+}

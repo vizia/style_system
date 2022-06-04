@@ -121,3 +121,20 @@ impl std::cmp::PartialOrd<Angle> for Angle {
         self.to_degrees().partial_cmp(&other.to_degrees())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        Angle, assert_angle,
+
+        dimension {
+            "deg" => Angle::Deg,
+            "grad" => Angle::Grad,
+            "Turn" => Angle::Turn,
+            "rad" => Angle::Rad,
+        }
+    }
+}

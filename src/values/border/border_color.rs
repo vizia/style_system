@@ -37,21 +37,10 @@ impl_from! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse;
-
-    macro_rules! border_color {
-        (($($top: tt),+), ($($right: tt),+), ($($bottom: tt),+), ($($left: tt),+)) => {
-            BorderColor {
-                top: $crate::Color::RGBA($crate::RGBA::rgba($($top),+)),
-                right: $crate::Color::RGBA($crate::RGBA::rgba($($right),+)),
-                bottom: $crate::Color::RGBA($crate::RGBA::rgba($($bottom),+)),
-                left: $crate::Color::RGBA($crate::RGBA::rgba($($left),+)),
-            }
-        };
-    }
+    use crate::tests::{assert_parse, border_color};
 
     assert_parse! {
-        BorderColor, border_color,
+        BorderColor, assert_border_color,
 
         success {
             "#000000" => border_color!((0, 0, 0, 255), (0, 0, 0, 255), (0, 0, 0, 255), (0, 0, 0, 255)),

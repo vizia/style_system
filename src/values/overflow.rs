@@ -30,14 +30,8 @@ impl_from! {
 
 #[cfg(test)]
 mod tests {
-    use super::{OverflowKeyword::*, *};
-    use crate::tests::assert_parse;
-
-    macro_rules! overflow {
-        ($x: expr, $y: expr) => {
-            Overflow { x: $x, y: $y }
-        };
-    }
+    use super::*;
+    use crate::tests::{assert_parse, overflow};
 
     assert_parse! {
         Overflow, parse_value,
@@ -63,7 +57,6 @@ mod tests {
                 "123",
                 "test visible",
             }
-
         }
     }
 }
