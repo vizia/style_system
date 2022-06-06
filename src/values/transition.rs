@@ -7,9 +7,9 @@ pub struct Transition {
     /// A list of properties affected by transition.
     pub property: String,
     /// The duration of the transition.
-    pub duration: f32,
+    pub duration: Duration,
     /// The delay of the transition.
-    pub delay: Option<f32>,
+    pub delay: Option<Duration>,
 }
 
 impl<'i> Parse<'i> for Transition {
@@ -17,9 +17,9 @@ impl<'i> Parse<'i> for Transition {
         let location = input.current_source_location();
 
         let property = Ident::parse(input)?.into();
-        let duration = Duration::parse(input)?.into();
+        let duration = Duration::parse(input)?;
         let delay = if let Ok(delay) = input.try_parse(Duration::parse) {
-            Some(delay.into())
+            Some(delay)
         } else {
             None
         };
@@ -55,8 +55,8 @@ mod tests {
 
         custom {
             success {
-                "width 2s" => transition!(String::from("width"), 2.0, None),
-                "height 2s 1s" => transition!(String::from("height"), 2.0, Some(1.0)),
+                "width 2s" => transition!(String::from("width"), Duration::from_secs(2), None),
+                "height 2s 1s" => transition!(String::from("height"), Duration::from_secs(2), Some(Duration::from_secs(1))),
             }
 
             failure {
@@ -72,9 +72,9 @@ mod tests {
         custom {
             success {
                 "height 1s 2s, width 3s 4s, rotation 5s 6s" => vec![
-                    transition!(String::from("height"), 1.0, Some(2.0)),
-                    transition!(String::from("width"), 3.0, Some(4.0)),
-                    transition!(String::from("rotation"), 5.0, Some(6.0)),
+                    transition!(String::from("height"), Duration::from_secs(1), Some(Duration::from_secs(2))),
+                    transition!(String::from("width"), Duration::from_secs(3), Some(Duration::from_secs(4))),
+                    transition!(String::from("rotation"), Duration::from_secs(5), Some(Duration::from_secs(6))),
                 ],
             }
 

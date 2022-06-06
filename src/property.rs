@@ -1,8 +1,7 @@
 use crate::{
-    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderStyle, BorderStyleKeyword,
-    BorderWidth, BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, Display,
-    FontSize, LayoutType, Length, Opacity, Overflow, Parse, PositionType, Transition, Units,
-    Visibility,
+    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth, BorderWidthValue,
+    BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize, LayoutType, Length, Opacity,
+    Overflow, Parse, PositionType, Transition, Units, Visibility,
 };
 use cssparser::Parser;
 
@@ -58,10 +57,11 @@ define_property! {
 
         // Border Color
         "border-color": BorderColor(BorderColor),
-        "border-top-color": BorderTopColor(Color),
-        "border-right-color": BorderRightColor(Color),
-        "border-bottom-color": BorderBottomColor(Color),
-        "border-left-color": BorderLeftColor(Color),
+        // TODO: Support coloring individual borders.
+        // "border-top-color": BorderTopColor(Color),
+        // "border-right-color": BorderRightColor(Color),
+        // "border-bottom-color": BorderBottomColor(Color),
+        // "border-left-color": BorderLeftColor(Color),
 
         // Border Corner Shape
         "border-corner-shape": BorderCornerShape(BorderCornerShape),
@@ -78,11 +78,12 @@ define_property! {
         "border-bottom-right-radius": BorderBottomRightRadius(Length),
 
         // Border Style
-        "border-style": BorderStyle(BorderStyle),
-        "border-top-style": BorderTopStyle(BorderStyleKeyword),
-        "border-right-style": BorderRightStyle(BorderStyleKeyword),
-        "border-bottom-style": BorderBottomStyle(BorderStyleKeyword),
-        "border-left-style": BorderLeftStyle(BorderStyleKeyword),
+        // TODO: Support styling borders.
+        // "border-style": BorderStyle(BorderStyle),
+        // "border-top-style": BorderTopStyle(BorderStyleKeyword),
+        // "border-right-style": BorderRightStyle(BorderStyleKeyword),
+        // "border-bottom-style": BorderBottomStyle(BorderStyleKeyword),
+        // "border-left-style": BorderLeftStyle(BorderStyleKeyword),
 
         // Border Width
         "border-width": BorderWidth(BorderWidth),
