@@ -1,7 +1,7 @@
 use crate::{
-    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth,
-    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize,
-    LayoutType, Length, Opacity, Overflow, Parse, PositionType, Transition, Units, Visibility,
+    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth, BorderWidthValue,
+    BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize, LayoutType, Length, Opacity,
+    Overflow, Parse, PositionType, Transition, Units, Visibility,
 };
 use cssparser::Parser;
 
@@ -110,20 +110,6 @@ define_property! {
         // "outline-right-color": OutlineRightColor(Color),
         // "outline-bottom-color": OutlineBottomColor(Color),
         // "outline-left-color": OutlineLeftColor(Color),
-
-        // Outline Corner Shape
-        "outline-corner-shape": OutlineCornerShape(BorderCornerShape),
-        "outline-top-left-shape": OutlineTopLeftShape(BorderCornerShape),
-        "outline-top-right-shape": OutlineTopRightShape(BorderCornerShape),
-        "outline-bottom-left-shape": OutlineBottomLeftShape(BorderCornerShape),
-        "outline-bottom-right-shape": OutlineBottomRightShape(BorderCornerShape),
-
-        // Outline Radius
-        "outline-radius": OutlineRadius(BorderRadius),
-        "outline-top-left-radius": OutlineTopLeftRadius(Length),
-        "outline-top-right-radius": OutlineTopRightRadius(Length),
-        "outline-bottom-left-radius": OutlineBottomLeftRadius(Length),
-        "outline-bottom-right-radius": OutlineBottomRightRadius(Length),
 
         // Outline Style
         // TODO: Support styling outlines.
