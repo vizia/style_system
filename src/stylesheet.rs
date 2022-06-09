@@ -81,6 +81,12 @@ button label {
     transition: test 1s, test2 2s, test3 3s 4s;
     background-color: weriwrgba(12, 13, 14, 0.1);
     backgrond-color: hsla(120, 100%, 50%, 0.1);
+    outline-color: red;
+    outline-bottom-color: #00FF00;
+    outline-corner-shape: round;
+    outline-top-right-shape: bevel;
+    outline-radius: 2px;
+    outline-bottom-left-radius: 10px;
 }
 
 test {

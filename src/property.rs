@@ -1,7 +1,7 @@
 use crate::{
-    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth, BorderWidthValue,
-    BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize, LayoutType, Length, Opacity,
-    Overflow, Parse, PositionType, Transition, Units, Visibility,
+    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth,
+    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize,
+    LayoutType, Length, Opacity, Overflow, Parse, PositionType, Transition, Units, Visibility,
 };
 use cssparser::Parser;
 
@@ -55,6 +55,10 @@ define_property! {
 
         // ----- Border -----
 
+        // Border Shorthand
+        // TODO: Support coloring and styling individual borders and enable this.
+        // "border": Border(Border),
+
         // Border Color
         "border-color": BorderColor(BorderColor),
         // TODO: Support coloring individual borders.
@@ -91,6 +95,50 @@ define_property! {
         "border-right-width": BorderRightWidth(BorderWidthValue),
         "border-bottom-width": BorderBottomWidth(BorderWidthValue),
         "border-left-width": BorderLeftWidth(BorderWidthValue),
+
+
+        // ----- Outline -----
+
+        // Outline Shorthand
+        // TODO: Support coloring and styling individual outlines.
+        // "outline": Outline(Outline),
+
+        // Outline Color
+        "outline-color": OutlineColor(BorderColor),
+        // TODO: Support coloring individual outlines.
+        // "outline-top-color": OutlineTopColor(Color),
+        // "outline-right-color": OutlineRightColor(Color),
+        // "outline-bottom-color": OutlineBottomColor(Color),
+        // "outline-left-color": OutlineLeftColor(Color),
+
+        // Outline Corner Shape
+        "outline-corner-shape": OutlineCornerShape(BorderCornerShape),
+        "outline-top-left-shape": OutlineTopLeftShape(BorderCornerShape),
+        "outline-top-right-shape": OutlineTopRightShape(BorderCornerShape),
+        "outline-bottom-left-shape": OutlineBottomLeftShape(BorderCornerShape),
+        "outline-bottom-right-shape": OutlineBottomRightShape(BorderCornerShape),
+
+        // Outline Radius
+        "outline-radius": OutlineRadius(BorderRadius),
+        "outline-top-left-radius": OutlineTopLeftRadius(Length),
+        "outline-top-right-radius": OutlineTopRightRadius(Length),
+        "outline-bottom-left-radius": OutlineBottomLeftRadius(Length),
+        "outline-bottom-right-radius": OutlineBottomRightRadius(Length),
+
+        // Outline Style
+        // TODO: Support styling outlines.
+        // "outline-style": OutlineStyle(BorderStyle),
+        // "outline-top-style": OutlineTopStyle(BorderStyleKeyword),
+        // "outline-right-style": OutlineRightStyle(BorderStyleKeyword),
+        // "outline-bottom-style": OutlineBottomStyle(BorderStyleKeyword),
+        // "outline-left-style": OutlineLeftStyle(BorderStyleKeyword),
+
+        // Outline Width
+        "outline-width": OutlineWidth(BorderWidth),
+        "outline-top-width": OutlineTopWidth(BorderWidthValue),
+        "outline-right-width": OutlineRightWidth(BorderWidthValue),
+        "outline-bottom-width": OutlineBottomWidth(BorderWidthValue),
+        "outline-left-width": OutlineLeftWidth(BorderWidthValue),
 
 
         // Background
