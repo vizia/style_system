@@ -1,4 +1,4 @@
-use cssparser::{CowRcStr, Token};
+use cssparser::{CowRcStr, Token, BasicParseErrorKind, ParseError, ParseErrorKind};
 use parcel_selectors::parser::SelectorParseErrorKind;
 use std::fmt;
 
@@ -50,8 +50,8 @@ impl fmt::Display for ErrorLocation {
 /// A source location.
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub struct Location {
-    /// The index of the source file within the source map.
-    pub source_index: u32,
+    // /// The index of the source file within the source map.
+    // pub source_index: u32,
     /// The line number, starting at 0.
     pub line: u32,
     /// The column number within a line, starting at 1 for first the character of the line.
@@ -63,7 +63,13 @@ pub struct Location {
 pub enum CustomParseError<'i> {
     InvalidValue,
     InvalidDeclaration,
+    InvalidNesting,
     SelectorError(SelectorError<'i>),
+    EndOfInput,
+    UnexpectedToken(Token<'i>),
+    AtRuleInvalid(CowRcStr<'i>),
+    AtRuleBodyInvalid,
+    QualifiedRuleInvalid,
 }
 
 impl<'i> From<SelectorParseErrorKind<'i>> for CustomParseError<'i> {
@@ -181,4 +187,30 @@ impl<'i> SelectorError<'i> {
         err => format!("Error parsing selector: {:?}", err)
         }
     }
+}
+
+
+impl<'i> Error<CustomParseError<'i>> {
+/// Creates an error from a cssparser error.
+pub fn from(err: ParseError<'i, CustomParseError<'i>>, filename: String) -> Error<CustomParseError<'i>> {
+    let kind = match err.kind {
+        ParseErrorKind::Basic(b) => match &b {
+            BasicParseErrorKind::UnexpectedToken(t) => CustomParseError::UnexpectedToken(t.clone()),
+            BasicParseErrorKind::EndOfInput => CustomParseError::EndOfInput,
+            BasicParseErrorKind::AtRuleInvalid(a) => CustomParseError::AtRuleInvalid(a.clone()),
+            BasicParseErrorKind::AtRuleBodyInvalid => CustomParseError::AtRuleBodyInvalid,
+            BasicParseErrorKind::QualifiedRuleInvalid => CustomParseError::QualifiedRuleInvalid,
+        },
+        ParseErrorKind::Custom(c) => c,
+    };
+
+    Error {
+        kind,
+        location: Some(ErrorLocation {
+            filename,
+            line: err.location.line,
+            column: err.location.column,
+        }),
+    }
+}
 }

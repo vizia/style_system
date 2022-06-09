@@ -40,8 +40,8 @@ impl<'i> SelectorImpl<'i> for Selectors {
 }
 
 pub struct SelectorParser<'a, 'i> {
-    default_namespace: &'a Option<CowRcStr<'i>>,
-    is_nesting_allowed: bool,
+    pub default_namespace: &'a Option<CowRcStr<'i>>,
+    pub is_nesting_allowed: bool,
 }
 
 impl<'a, 'i> parcel_selectors::parser::Parser<'i> for SelectorParser<'a, 'i> {
@@ -134,10 +134,6 @@ mod tests {
     };
 
     use super::*;
-
-    const VALID_ELEMENT_SELECTOR: &str = "button";
-
-    //pub struct CompiledSelector(Selector<Selectors>);
 
     fn parse<'i>(
         input: &'i str,

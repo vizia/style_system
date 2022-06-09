@@ -5,7 +5,7 @@ use cssparser::{CowRcStr, ParseError, Parser};
 pub struct DeclarationParser;
 
 impl<'i> cssparser::DeclarationParser<'i> for DeclarationParser {
-    type Declaration = Property;
+    type Declaration = Property<'i>;
     type Error = CustomParseError<'i>;
 
     fn parse_value<'t>(
@@ -19,6 +19,6 @@ impl<'i> cssparser::DeclarationParser<'i> for DeclarationParser {
 
 impl<'i> cssparser::AtRuleParser<'i> for DeclarationParser {
     type Prelude = ();
-    type AtRule = Property;
+    type AtRule = Property<'i>;
     type Error = CustomParseError<'i>;
 }

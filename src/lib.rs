@@ -13,6 +13,9 @@ pub use property::*;
 mod macros;
 pub use macros::*;
 
+mod matching;
+pub use matching::*;
+
 mod error;
 pub use error::*;
 
@@ -24,6 +27,9 @@ pub use pseudoclass::*;
 
 mod pseudoelement;
 pub use pseudoelement::*;
+
+mod declaration;
+pub use declaration::*;
 
 mod stylesheet;
 pub use stylesheet::*;

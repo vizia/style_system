@@ -1,16 +1,39 @@
 use crate::error::Error;
-use crate::ParserOptions;
+use crate::{ParserOptions, CssRule};
 
+use crate::rule::TopLevelRuleParser;
 use crate::{CssRuleList, CustomParseError};
 use cssparser::*;
 
 #[derive(Debug)]
-pub struct StyleSheet<'i> {
+pub struct StyleSheet<'i,'o> {
     // List of top level rules
     rules: CssRuleList<'i>,
+    options: ParserOptions<'o>,
 }
 
-impl<'i> StyleSheet<'i> {
+impl<'i,'o> StyleSheet<'i,'o> {
+    pub fn parse(filename: &str, code: &'i str, options: ParserOptions<'o>) -> Result<Self, Error<CustomParseError<'i>>> {
+        let mut input = ParserInput::new(&code);
+        let mut parser = Parser::new(&mut input);
+        let rule_list_parser = RuleListParser::new_for_stylesheet(&mut parser, TopLevelRuleParser::new(&options));
+
+        let mut rules = vec![];
+        for rule in rule_list_parser {
+            let rule = match rule {
+                Ok((_, CssRule::Ignored)) => continue,
+                Ok((_, rule)) => rule,
+                Err((e, _)) => return Err(Error::from(e, filename.to_owned())),
+            };
+    
+            rules.push(rule)
+        }
+
+        Ok(StyleSheet {
+            rules: CssRuleList(rules),
+            options,
+        })
+    }
     // pub fn parse(code: &'i str, options: &ParserOptions<'i>) -> Result<Self, Error<CustomParseError<'i>>> {
     //     let mut input = ParserInput::new(&code);
     //     let mut parser = Parser::new(&mut input);
@@ -97,10 +120,16 @@ test {
 }
 "#;
 
+const EXAMPLE: &str = r#"
+button {
+    background-color: blue;
+}
+"#;
+
     #[test]
     fn parse_stylsheet() {
-        //let style_sheet = StyleSheet::from_string(CSS_EXAMPLE);
-        //println!("{:#?}", style_sheet);
+        let style_sheet = StyleSheet::parse("test.css", EXAMPLE, ParserOptions::default());
+        println!("{:#?}", style_sheet);
     }
 }
 

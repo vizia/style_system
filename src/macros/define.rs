@@ -1,3 +1,4 @@
+
 macro_rules! define_enum_value {
     (
         $(#[$outer:meta])*
@@ -32,16 +33,20 @@ macro_rules! define_property {
         }
     ) => {
         $(#[$outer])*
+
+        use crate::CustomProperty;
+
         #[derive(Debug, Clone, PartialEq)]
-        $vis enum $name {
+        $vis enum $name<'i> {
             $(
                 $(#[$meta])*
                 $variant($inner_ty),
             )+
+            Custom(CustomProperty<'i>),
         }
 
-        impl $name {
-            pub fn parse_value<'i, 't>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
+        impl<'i> $name<'i> {
+            pub fn parse_value<'t>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
                 let location = input.current_source_location();
                 match name {
                     $(

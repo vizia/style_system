@@ -107,3 +107,19 @@ define_property! {
         "cursor": Cursor(CursorIcon),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use cssparser::ParserInput;
+
+    use super::*;
+
+    #[test]
+    fn parse_property() {
+        let mut parser_input = ParserInput::new("red");
+        let mut parser = Parser::new(&mut parser_input);
+        let parsed_property = Property::parse_value("background-color", &mut parser);
+        
+        println!("{:?}", parsed_property);
+    }
+}
