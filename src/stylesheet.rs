@@ -87,6 +87,10 @@ button label {
     outline-top-right-shape: bevel;
     outline-radius: 2px;
     outline-bottom-left-radius: 10px;
+    rotation: 120deg;
+    rotation: 20grad;
+    rotation: 40rad;
+    rotation: 30turn;
 }
 
 test {

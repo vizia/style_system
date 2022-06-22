@@ -20,7 +20,7 @@ impl_parse! {
         dimension {
             "deg" => Angle::Deg,
             "grad" => Angle::Grad,
-            "Turn" => Angle::Turn,
+            "turn" => Angle::Turn,
             "rad" => Angle::Rad,
         }
     }
@@ -133,7 +133,7 @@ mod tests {
         dimension {
             "deg" => Angle::Deg,
             "grad" => Angle::Grad,
-            "Turn" => Angle::Turn,
+            "turn" => Angle::Turn,
             "rad" => Angle::Rad,
         }
     }
