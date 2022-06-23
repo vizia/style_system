@@ -101,43 +101,4 @@ macro_rules! impl_parse {
     };
 }
 
-macro_rules! impl_from {
-    (
-        $name: tt,
-
-        from {
-            $(
-                $from_type: ty => $from_closure: expr,
-            )+
-        }
-
-        $(
-            into {
-                $(
-                    $into_type: ty => $into_closure: expr,
-                )+
-            }
-        )?
-    ) => {
-        $(
-            impl From<$from_type> for $name {
-                fn from(x: $from_type) -> Self {
-                    $from_closure(x)
-                }
-            }
-        )+
-
-        $(
-            $(
-                impl From<$name> for $into_type {
-                    fn from(x: $name) -> Self {
-                        $into_closure(x)
-                    }
-                }
-            )+
-        )?
-    };
-}
-
-pub(crate) use impl_from;
 pub(crate) use impl_parse;

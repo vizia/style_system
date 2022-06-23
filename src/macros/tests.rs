@@ -83,6 +83,13 @@ macro_rules! assert_parse {
             }
         )?
 
+        // Length values
+        $(
+            length {
+                $length_type: expr,
+            }
+        )?
+
         // Custom values
         $(
             custom {
@@ -177,6 +184,25 @@ macro_rules! assert_parse {
                     )+
                 )?
 
+                // Length values
+                $(
+                    "1px" => $length_type($crate::Length::px(1.0)),
+                    "2in" => $length_type($crate::Length::Value($crate::LengthValue::In(2.0))),
+                    "3cm" => $length_type($crate::Length::Value($crate::LengthValue::Cm(3.0))),
+                    "4mm" => $length_type($crate::Length::Value($crate::LengthValue::Mm(4.0))),
+                    "5q" => $length_type($crate::Length::Value($crate::LengthValue::Q(5.0))),
+                    "6pt" => $length_type($crate::Length::Value($crate::LengthValue::Pt(6.0))),
+                    "7pc" => $length_type($crate::Length::Value($crate::LengthValue::Pc(7.0))),
+                    "8em" => $length_type($crate::Length::Value($crate::LengthValue::Em(8.0))),
+                    "9ex" => $length_type($crate::Length::Value($crate::LengthValue::Ex(9.0))),
+                    "10ch" => $length_type($crate::Length::Value($crate::LengthValue::Ch(10.0))),
+                    "11rem" => $length_type($crate::Length::Value($crate::LengthValue::Rem(11.0))),
+                    "12vw" => $length_type($crate::Length::Value($crate::LengthValue::Vw(12.0))),
+                    "13vh" => $length_type($crate::Length::Value($crate::LengthValue::Vh(13.0))),
+                    "14vmin" => $length_type($crate::Length::Value($crate::LengthValue::Vmin(14.0))),
+                    "15vmax" => $length_type($crate::Length::Value($crate::LengthValue::Vmax(15.0))),
+                )?
+
                 // Custom values
                 $(
                     $(
@@ -223,6 +249,14 @@ macro_rules! assert_parse {
                     )+
                 )?
 
+                // Length values
+                $(
+                    stringify!($length_type),
+                    "abc",
+                    "0abc",
+                    "a0",
+                )?
+
                 // Custom values
                 $(
                     $(
@@ -236,119 +270,4 @@ macro_rules! assert_parse {
     }
 }
 
-macro_rules! border_color {
-    (($($top: tt),+), ($($right: tt),+), ($($bottom: tt),+), ($($left: tt),+)) => {
-        $crate::BorderColor {
-            top: $crate::Color::RGBA($crate::RGBA::rgba($($top),+)),
-            right: $crate::Color::RGBA($crate::RGBA::rgba($($right),+)),
-            bottom: $crate::Color::RGBA($crate::RGBA::rgba($($bottom),+)),
-            left: $crate::Color::RGBA($crate::RGBA::rgba($($left),+)),
-        }
-    };
-}
-
-macro_rules! border_width {
-    ($top: expr, $right: expr, $bottom: expr, $left: expr) => {{
-        use $crate::Length;
-
-        $crate::BorderWidth {
-            top: $crate::BorderWidthValue($top),
-            right: $crate::BorderWidthValue($right),
-            bottom: $crate::BorderWidthValue($bottom),
-            left: $crate::BorderWidthValue($left),
-        }
-    }};
-}
-
-macro_rules! border_radius {
-    ($top_left: expr, $top_right: expr, $bottom_right: expr, $bottom_left: expr) => {{
-        use $crate::Length::*;
-        use $crate::LengthValue::*;
-
-        $crate::BorderRadius {
-            top_left: Value($top_left),
-            top_right: Value($top_right),
-            bottom_right: Value($bottom_right),
-            bottom_left: Value($bottom_left),
-        }
-    }};
-}
-
-macro_rules! border_style {
-    ($top: ident, $right: ident, $bottom: ident, $left: ident) => {
-        $crate::BorderStyle {
-            top: $crate::BorderStyleKeyword::$top,
-            right: $crate::BorderStyleKeyword::$right,
-            bottom: $crate::BorderStyleKeyword::$bottom,
-            left: $crate::BorderStyleKeyword::$left,
-        }
-    };
-}
-
-macro_rules! border {
-    ($width: expr, $style: expr, $color: expr,) => {
-        $crate::Border {
-            width: $width,
-            style: $style,
-            color: $color,
-        }
-    };
-}
-
-macro_rules! box_shadow {
-    (
-        $x_offset: expr,
-        $y_offset: expr,
-        $blur: expr,
-        $spread: expr,
-        $color: expr,
-        $inset: expr,
-    ) => {
-        $crate::BoxShadow {
-            x_offset: $x_offset,
-            y_offset: $y_offset,
-            blur: $blur,
-            spread: $spread,
-            color: $color,
-            inset: $inset,
-        }
-    };
-}
-
-macro_rules! color {
-    ($red: literal, $green: literal, $blue: literal) => {
-        $crate::Color::RGBA($crate::RGBA::rgb($red, $green, $blue))
-    };
-    ($red: literal, $green: literal, $blue: literal, $alpha: literal) => {
-        $crate::Color::RGBA($crate::RGBA::rgba($red, $green, $blue, $alpha))
-    };
-}
-
-macro_rules! overflow {
-    ($x: expr, $y: expr) => {{
-        use $crate::OverflowKeyword::*;
-
-        $crate::Overflow { x: $x, y: $y }
-    }};
-}
-
-macro_rules! transition {
-    ($property: expr, $duration: expr, $delay: expr$(,)?) => {{
-        Transition {
-            property: $property,
-            duration: $duration,
-            delay: $delay,
-        }
-    }};
-}
-
 pub(crate) use assert_parse;
-pub(crate) use border;
-pub(crate) use border_color;
-pub(crate) use border_radius;
-pub(crate) use border_style;
-pub(crate) use border_width;
-pub(crate) use box_shadow;
-pub(crate) use color;
-pub(crate) use overflow;
-pub(crate) use transition;

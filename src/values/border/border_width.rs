@@ -1,4 +1,4 @@
-use crate::{impl_from, impl_parse, BorderWidthValue, Parse, Rect};
+use crate::{impl_parse, BorderWidthValue, Parse, Rect};
 
 /// Defines the width of every border of a rectangle.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -13,6 +13,23 @@ pub struct BorderWidth {
     pub left: BorderWidthValue,
 }
 
+impl BorderWidth {
+    /// Creates a new border width.
+    pub fn new(
+        top: BorderWidthValue,
+        right: BorderWidthValue,
+        bottom: BorderWidthValue,
+        left: BorderWidthValue,
+    ) -> Self {
+        Self {
+            top,
+            right,
+            bottom,
+            left,
+        }
+    }
+}
+
 impl_parse! {
     BorderWidth,
 
@@ -21,38 +38,31 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    BorderWidth,
-
-    from {
-        Rect<BorderWidthValue> => |x: Rect<BorderWidthValue>| BorderWidth {
-            top: x.0,
-            right: x.1,
-            bottom: x.2,
-            left: x.3
-        },
+impl From<Rect<BorderWidthValue>> for BorderWidth {
+    fn from(rect: Rect<BorderWidthValue>) -> Self {
+        BorderWidth::new(rect.0, rect.1, rect.2, rect.3)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, border_width};
+    use crate::{tests::assert_parse, Length};
 
     assert_parse! {
         BorderWidth, assert_border_width,
 
         custom {
             success {
-                "10px" => border_width!(Length::px(10.0), Length::px(10.0), Length::px(10.0), Length::px(10.0)),
-                "10px 20px" => border_width!(Length::px(10.0), Length::px(20.0), Length::px(10.0), Length::px(20.0)),
-                "10px 20px 30px" => border_width!(Length::px(10.0), Length::px(20.0), Length::px(30.0), Length::px(20.0)),
-                "10px 20px 30px 40px" => border_width!(Length::px(10.0), Length::px(20.0), Length::px(30.0), Length::px(40.0)),
+                "10px" => BorderWidth::new(Length::px(10.0).into(), Length::px(10.0).into(), Length::px(10.0).into(), Length::px(10.0).into()),
+                "10px 20px" => BorderWidth::new(Length::px(10.0).into(), Length::px(20.0).into(), Length::px(10.0).into(), Length::px(20.0).into()),
+                "10px 20px 30px" => BorderWidth::new(Length::px(10.0).into(), Length::px(20.0).into(), Length::px(30.0).into(), Length::px(20.0).into()),
+                "10px 20px 30px 40px" => BorderWidth::new(Length::px(10.0).into(), Length::px(20.0).into(), Length::px(30.0).into(), Length::px(40.0).into()),
 
-                "thin" => border_width!(Length::px(1.0), Length::px(1.0), Length::px(1.0), Length::px(1.0)),
-                "thin medium" => border_width!(Length::px(1.0), Length::px(3.0), Length::px(1.0), Length::px(3.0)),
-                "thin medium thick" => border_width!(Length::px(1.0), Length::px(3.0), Length::px(5.0), Length::px(3.0)),
-                "thin medium thick thin" => border_width!(Length::px(1.0), Length::px(3.0), Length::px(5.0), Length::px(1.0)),
+                "thin" => BorderWidth::new(Length::px(1.0).into(), Length::px(1.0).into(), Length::px(1.0).into(), Length::px(1.0).into()),
+                "thin medium" => BorderWidth::new(Length::px(1.0).into(), Length::px(3.0).into(), Length::px(1.0).into(), Length::px(3.0).into()),
+                "thin medium thick" => BorderWidth::new(Length::px(1.0).into(), Length::px(3.0).into(), Length::px(5.0).into(), Length::px(3.0).into()),
+                "thin medium thick thin" => BorderWidth::new(Length::px(1.0).into(), Length::px(3.0).into(), Length::px(5.0).into(), Length::px(1.0).into()),
             }
 
             failure {

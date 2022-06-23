@@ -1,4 +1,4 @@
-use crate::{impl_from, impl_parse, BorderStyleKeyword, Parse, Rect};
+use crate::{impl_parse, BorderStyleKeyword, Parse, Rect};
 
 /// Defines the style of every border of a rectangle.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -13,6 +13,23 @@ pub struct BorderStyle {
     pub left: BorderStyleKeyword,
 }
 
+impl BorderStyle {
+    /// Creates a new border style.
+    pub fn new(
+        top: BorderStyleKeyword,
+        right: BorderStyleKeyword,
+        bottom: BorderStyleKeyword,
+        left: BorderStyleKeyword,
+    ) -> Self {
+        Self {
+            top,
+            right,
+            bottom,
+            left,
+        }
+    }
+}
+
 impl_parse! {
     BorderStyle,
 
@@ -21,33 +38,26 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    BorderStyle,
-
-    from {
-        Rect<BorderStyleKeyword> => |x: Rect<BorderStyleKeyword>| BorderStyle {
-            top: x.0,
-            right: x.1,
-            bottom: x.2,
-            left: x.3
-        },
+impl From<Rect<BorderStyleKeyword>> for BorderStyle {
+    fn from(rect: Rect<BorderStyleKeyword>) -> Self {
+        Self::new(rect.0, rect.1, rect.2, rect.3)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, border_style};
+    use crate::{tests::assert_parse, BorderStyleKeyword::*};
 
     assert_parse! {
         BorderStyle, assert_border_style,
 
         custom {
             success {
-                "none" => border_style!(None, None, None, None),
-                "none solid" => border_style!(None, Solid, None, Solid),
-                "none solid dashed" => border_style!(None, Solid, Dashed, Solid),
-                "none solid dashed groove" => border_style!(None, Solid, Dashed, Groove),
+                "none" => BorderStyle::new(None, None, None, None),
+                "none solid" => BorderStyle::new(None, Solid, None, Solid),
+                "none solid dashed" => BorderStyle::new(None, Solid, Dashed, Solid),
+                "none solid dashed groove" => BorderStyle::new(None, Solid, Dashed, Groove),
             }
 
             failure {

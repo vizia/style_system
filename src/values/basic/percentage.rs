@@ -1,4 +1,4 @@
-use crate::{impl_from, impl_parse, Calc, Parse};
+use crate::{impl_parse, Calc, Parse};
 use cssparser::Token;
 
 /// A percentage value.
@@ -15,15 +15,18 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Percentage,
-
-    from {
-        Calc<Percentage> => |x| match x { Calc::Value(v) => *v, _ => unreachable!(), },
+impl From<Calc<Percentage>> for Percentage {
+    fn from(calc: Calc<Percentage>) -> Self {
+        match calc {
+            Calc::Value(v) => *v,
+            _ => unreachable!(),
+        }
     }
+}
 
-    into {
-        Calc<Percentage> => |x| Calc::Value(Box::new(x)),
+impl From<Percentage> for Calc<Percentage> {
+    fn from(percentage: Percentage) -> Self {
+        Calc::Value(Box::new(percentage))
     }
 }
 

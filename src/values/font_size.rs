@@ -1,7 +1,4 @@
-use crate::{
-    macros::{impl_from, impl_parse},
-    FontSizeKeyword, Parse,
-};
+use crate::{macros::impl_parse, FontSizeKeyword, Parse};
 
 /// A font size value.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -16,11 +13,9 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    FontSize,
-
-    from {
-        FontSizeKeyword => |x| match x {
+impl From<FontSizeKeyword> for FontSize {
+    fn from(font_size_keyword: FontSizeKeyword) -> Self {
+        match font_size_keyword {
             FontSizeKeyword::XXSmall => FontSize(8.0),
             FontSizeKeyword::XSmall => FontSize(10.0),
             FontSizeKeyword::Small => FontSize(12.0),
@@ -28,12 +23,19 @@ impl_from! {
             FontSizeKeyword::Large => FontSize(16.0),
             FontSizeKeyword::XLarge => FontSize(18.0),
             FontSizeKeyword::XXLarge => FontSize(20.0),
-        },
-        f32 => |x| FontSize(x),
+        }
     }
+}
 
-    into {
-        f32 => |x: FontSize| x.0,
+impl From<f32> for FontSize {
+    fn from(number: f32) -> Self {
+        FontSize(number)
+    }
+}
+
+impl From<FontSize> for f32 {
+    fn from(font_size: FontSize) -> Self {
+        font_size.0
     }
 }
 

@@ -1,7 +1,4 @@
-use crate::{
-    macros::{impl_from, impl_parse},
-    Parse, Percentage,
-};
+use crate::{macros::impl_parse, Parse, Percentage};
 
 /// An opacity value in the range of 0 to 1.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -16,16 +13,21 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Opacity,
-
-    from {
-        f32 => |x| Opacity(x),
-        Percentage => |x: Percentage| Opacity(x.0),
+impl From<f32> for Opacity {
+    fn from(number: f32) -> Self {
+        Opacity(number)
     }
+}
 
-    into {
-        f32 => |x: Opacity| x.0,
+impl From<Percentage> for Opacity {
+    fn from(percentage: Percentage) -> Self {
+        Opacity(percentage.0)
+    }
+}
+
+impl From<Opacity> for f32 {
+    fn from(opacity: Opacity) -> Self {
+        opacity.0
     }
 }
 
