@@ -1,4 +1,4 @@
-use crate::{impl_parse, macros::impl_from, Parse};
+use crate::{impl_parse, Parse};
 
 /// A factor of the remaining free space.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -14,15 +14,15 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Stretch,
-
-    from {
-        f32 => |x| Stretch(x),
+impl From<f32> for Stretch {
+    fn from(number: f32) -> Self {
+        Stretch(number)
     }
+}
 
-    into {
-        f32 => |x: Stretch| x.0,
+impl From<Stretch> for f32 {
+    fn from(stretch: Stretch) -> Self {
+        stretch.0
     }
 }
 

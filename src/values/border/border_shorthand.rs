@@ -1,30 +1,47 @@
-use crate::{impl_parse, BorderColor, BorderStyle, BorderWidth, CustomParseError, Parse};
+use cssparser::{ParseError, Parser};
 
+use crate::{BorderColor, BorderStyle, BorderWidth, CustomParseError, Parse};
+
+/// The border shorthand containing a border width, style and color.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Border {
+    /// The width of the border.
     pub width: Option<BorderWidth>,
+    /// The style of the border.
     pub style: Option<BorderStyle>,
+    /// The color of the border.
     pub color: Option<BorderColor>,
 }
 
-impl_parse! {
-    Border,
+impl Border {
+    /// Creates a new border.
+    pub fn new(
+        width: Option<BorderWidth>,
+        style: Option<BorderStyle>,
+        color: Option<BorderColor>,
+    ) -> Self {
+        Self {
+            width,
+            style,
+            color,
+        }
+    }
+}
 
-    custom {
-        |input| {
-            let location = input.current_source_location();
-            let width = input.try_parse(BorderWidth::parse).map(|x| Some(x)).unwrap_or(None);
-            let style = input.try_parse(BorderStyle::parse).map(|x| Some(x)).unwrap_or(None);
-            let color = input.try_parse(BorderColor::parse).map(|x| Some(x)).unwrap_or(None);
+impl<'i> Parse<'i> for Border {
+    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
+        let location = input.current_source_location();
+        let width = input.try_parse(BorderWidth::parse).ok();
+        let style = input.try_parse(BorderStyle::parse).ok();
+        let color = input.try_parse(BorderColor::parse).ok();
 
-            if (width.is_some() || style.is_some() || color.is_some()) && input.is_exhausted() {
-                Ok(Border { width, style, color })
-            } else {
-                return Err(cssparser::ParseError {
-                    kind: cssparser::ParseErrorKind::Custom(CustomParseError::InvalidDeclaration),
-                    location,
-                });
-            }
+        if (width.is_some() || style.is_some() || color.is_some()) && input.is_exhausted() {
+            Ok(Border::new(width, style, color))
+        } else {
+            return Err(cssparser::ParseError {
+                kind: cssparser::ParseErrorKind::Custom(CustomParseError::InvalidDeclaration),
+                location,
+            });
         }
     }
 }
@@ -32,32 +49,32 @@ impl_parse! {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, border, border_color, border_style, border_width};
+    use crate::{tests::assert_parse, BorderStyleKeyword, Color, Length};
 
     assert_parse! {
         Border, assert_border,
 
         custom {
             success {
-                "thin thick" => border!(
-                    Some(border_width!(Length::px(1.0), Length::px(5.0), Length::px(1.0), Length::px(5.0))),
+                "thin thick" => Border::new(
+                    Some(BorderWidth::new(Length::px(1.0).into(), Length::px(5.0).into(), Length::px(1.0).into(), Length::px(5.0).into())),
                     None,
                     None,
                 ),
-                "solid dotted" => border!(
+                "solid dotted" => Border::new(
                     None,
-                    Some(border_style!(Solid, Dotted, Solid, Dotted)),
+                    Some(BorderStyle::new(BorderStyleKeyword::Solid, BorderStyleKeyword::Dotted, BorderStyleKeyword::Solid, BorderStyleKeyword::Dotted)),
                     None,
                 ),
-                "#00FF00 #FF00FF" => border!(
+                "#00FF00 #FF00FF" => Border::new(
                     None,
                     None,
-                    Some(border_color!((0, 255, 0, 255), (255, 0, 255, 255), (0, 255, 0, 255), (255, 0, 255, 255))),
+                    Some(BorderColor::new(Color::rgb(0, 255, 0), Color::rgb(255, 0, 255), Color::rgb(0, 255, 0), Color::rgb(255, 0, 255))),
                 ),
-                "thin thick solid dotted #00FF00 #FF00FF" => border!(
-                    Some(border_width!(Length::px(1.0), Length::px(5.0), Length::px(1.0), Length::px(5.0))),
-                    Some(border_style!(Solid, Dotted, Solid, Dotted)),
-                    Some(border_color!((0, 255, 0, 255), (255, 0, 255, 255), (0, 255, 0, 255), (255, 0, 255, 255))),
+                "thin thick solid dotted #00FF00 #FF00FF" => Border::new(
+                    Some(BorderWidth::new(Length::px(1.0).into(), Length::px(5.0).into(), Length::px(1.0).into(), Length::px(5.0).into())),
+                    Some(BorderStyle::new(BorderStyleKeyword::Solid, BorderStyleKeyword::Dotted, BorderStyleKeyword::Solid, BorderStyleKeyword::Dotted)),
+                    Some(BorderColor::new(Color::rgb(0, 255, 0), Color::rgb(255, 0, 255), Color::rgb(0, 255, 0), Color::rgb(255, 0, 255))),
                 ),
             }
 

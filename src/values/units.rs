@@ -1,4 +1,4 @@
-use crate::{impl_from, macros::impl_parse, AutoKeyword, LengthPixels, Parse, Percentage, Stretch};
+use crate::{macros::impl_parse, AutoKeyword, LengthPixels, Parse, Percentage, Stretch};
 pub use morphorm::Units;
 
 impl_parse! {
@@ -12,14 +12,27 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Units,
+impl From<AutoKeyword> for Units {
+    fn from(_: AutoKeyword) -> Self {
+        Units::Auto
+    }
+}
 
-    from {
-        AutoKeyword => |_| Self::Auto,
-        Stretch => |x: Stretch| Self::Stretch(x.0),
-        Percentage => |x: Percentage| Self::Percentage(x.0),
-        LengthPixels => |x: LengthPixels| Self::Pixels(x.0),
+impl From<Stretch> for Units {
+    fn from(stretch: Stretch) -> Self {
+        Self::Stretch(stretch.0)
+    }
+}
+
+impl From<Percentage> for Units {
+    fn from(percentage: Percentage) -> Self {
+        Self::Percentage(percentage.0)
+    }
+}
+
+impl From<LengthPixels> for Units {
+    fn from(length_pixels: LengthPixels) -> Self {
+        Self::Pixels(length_pixels.0)
     }
 }
 

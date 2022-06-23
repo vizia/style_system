@@ -1,4 +1,4 @@
-use crate::{impl_from, impl_parse, Calc, Parse, TryAdd};
+use crate::{impl_parse, Calc, Parse, TryAdd};
 
 /// A value representing an angle expressed in degrees, gradians, radians, or turns.
 #[derive(Debug, Clone)]
@@ -55,15 +55,18 @@ impl Angle {
     }
 }
 
-impl_from! {
-    Angle,
-
-    from {
-        Calc<Angle> => |x| match x { Calc::Value(v) => *v, _ => unreachable!(), },
+impl From<Calc<Angle>> for Angle {
+    fn from(calc: Calc<Angle>) -> Self {
+        match calc {
+            Calc::Value(v) => *v,
+            _ => unreachable!(),
+        }
     }
+}
 
-    into {
-        Calc<Angle> => |x| Calc::Value(Box::new(x)),
+impl From<Angle> for Calc<Angle> {
+    fn from(angle: Angle) -> Self {
+        Calc::Value(Box::new(angle))
     }
 }
 

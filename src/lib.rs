@@ -1,6 +1,9 @@
 mod values;
 pub use values::*;
 
+mod properties;
+pub use properties::*;
+
 // mod rules;
 // pub use rules::*;
 

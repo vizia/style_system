@@ -1,4 +1,4 @@
-use crate::{impl_from, impl_parse, traits::Parse, Percentage};
+use crate::{impl_parse, traits::Parse, Percentage};
 
 /// A value specifying the alpha channel or transparency of a color.
 #[derive(Debug, Clone, PartialEq)]
@@ -13,16 +13,21 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    AlphaValue,
-
-    from {
-        f32 => |x| AlphaValue(x),
-        Percentage => |x: Percentage| AlphaValue(x.0),
+impl From<f32> for AlphaValue {
+    fn from(number: f32) -> Self {
+        AlphaValue(number)
     }
+}
 
-    into {
-        f32 => |x: AlphaValue| x.0,
+impl From<Percentage> for AlphaValue {
+    fn from(percentage: Percentage) -> Self {
+        AlphaValue(percentage.0)
+    }
+}
+
+impl From<AlphaValue> for f32 {
+    fn from(alpha_value: AlphaValue) -> Self {
+        alpha_value.0
     }
 }
 
