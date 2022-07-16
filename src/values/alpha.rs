@@ -1,31 +1,45 @@
-use crate::{impl_from_newtype, impl_parse_try_parse, traits::Parse, Percentage};
+use crate::{impl_from, impl_parse, traits::Parse, Percentage};
 
 /// A value specifying the alpha channel or transparency of a color.
 #[derive(Debug, Clone, PartialEq)]
 pub struct AlphaValue(pub f32);
 
-impl_parse_try_parse! {
+impl_parse! {
     AlphaValue,
-    Percentage, f32,
+
+    try_parse {
+        Percentage,
+        f32,
+    }
 }
 
-impl_from_newtype! {
-    AlphaValue(f32),
-    Percentage,
+impl_from! {
+    AlphaValue,
+
+    from {
+        f32 => |x| AlphaValue(x),
+        Percentage => |x: Percentage| AlphaValue(x.0),
+    }
+
+    into {
+        f32 => |x: AlphaValue| x.0,
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse_numbers, assert_parse_percentages};
+    use crate::tests::assert_parse;
 
-    assert_parse_numbers! {
+    assert_parse! {
         AlphaValue, parse_numbers,
-        AlphaValue,
-    }
 
-    assert_parse_percentages! {
-        AlphaValue, parse_percentages,
-        AlphaValue,
+        number {
+            AlphaValue,
+        }
+
+        percentage {
+            AlphaValue,
+        }
     }
 }

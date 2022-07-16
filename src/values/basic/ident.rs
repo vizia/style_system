@@ -1,43 +1,33 @@
-use cssparser::{CowRcStr, ParseError, Parser, Token};
+use cssparser::*;
 
 use crate::{
-    macros::{impl_from_newtype, impl_parse_expect},
-    CustomParseError, Parse,
+    macros::{impl_from, impl_parse},
+    Parse, CustomParseError,
 };
 
-/// A simple ident stored.
+/// A simple ident.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Ident(pub String);
 
-impl_parse_expect! {
+impl_parse! {
     Ident,
-    cssparser::Token::Ident(ident) => ident.as_ref().to_owned().into(),
+
+    tokens {
+        custom {
+            cssparser::Token::Ident(ident) => ident.as_ref().to_owned().into(),
+        }
+    }
 }
 
-impl_from_newtype! {
-    Ident(String),
-}
+impl_from! {
+    Ident,
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::tests::assert_parse_value;
+    from {
+        String => |x| Ident(x),
+    }
 
-    assert_parse_value! {
-        Ident, ident,
-
-        success {
-            "ident" => Ident(String::from("ident")),
-            "border" => Ident(String::from("border")),
-            "color" => Ident(String::from("color")),
-            "yes" => Ident(String::from("yes")),
-            "no" => Ident(String::from("no")),
-        }
-
-        failure {
-            "123",
-            "123ident",
-        }
+    into {
+        String => |x: Ident| x.0,
     }
 }
 
@@ -58,5 +48,30 @@ impl<'i> Parse<'i> for DashedIdent<'i> {
         }
 
         Ok(DashedIdent(ident.clone()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::assert_parse;
+
+    assert_parse! {
+        Ident, assert_ident,
+
+        custom {
+            success {
+                "ident" => Ident(String::from("ident")),
+                "border" => Ident(String::from("border")),
+                "color" => Ident(String::from("color")),
+                "yes" => Ident(String::from("yes")),
+                "no" => Ident(String::from("no")),
+            }
+
+            failure {
+                "123",
+                "123ident",
+            }
+        }
     }
 }

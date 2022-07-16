@@ -1,71 +1,53 @@
-use crate::{
-    auto::AutoKeyword, length::Length, macros::impl_parse_try_parse, percentage::Percentage,
-    stretch::Stretch, Parse,
-};
+use crate::{impl_from, macros::impl_parse, AutoKeyword, LengthPixels, Parse, Percentage, Stretch};
 pub use morphorm::Units;
 
-impl_parse_try_parse! {
+impl_parse! {
     Units,
-    AutoKeyword, Stretch, Percentage, Length,
-}
 
-impl From<AutoKeyword> for Units {
-    fn from(_: AutoKeyword) -> Self {
-        Self::Auto
+    try_parse {
+        AutoKeyword,
+        Stretch,
+        Percentage,
+        LengthPixels,
     }
 }
 
-impl From<Stretch> for Units {
-    fn from(stretch: Stretch) -> Self {
-        Self::Stretch(stretch.0)
-    }
-}
+impl_from! {
+    Units,
 
-impl From<Percentage> for Units {
-    fn from(percentage: Percentage) -> Self {
-        Self::Percentage(percentage.0)
-    }
-}
-
-impl From<Length> for Units {
-    fn from(length: Length) -> Self {
-        if let Some(pixels) = length.to_px() {
-            Self::Pixels(pixels)
-        } else {
-            Self::Auto
-        }
+    from {
+        AutoKeyword => |_| Self::Auto,
+        Stretch => |x: Stretch| Self::Stretch(x.0),
+        Percentage => |x: Percentage| Self::Percentage(x.0),
+        LengthPixels => |x: LengthPixels| Self::Pixels(x.0),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        tests::{assert_parse_dimensions, assert_parse_idents, assert_parse_percentages},
-        LengthValue,
-    };
+    use crate::{tests::assert_parse, LengthValue};
 
-    assert_parse_percentages! {
-        Units, parse_percentages,
-        Units::Percentage,
-    }
+    assert_parse! {
+        Units, parse_units,
 
-    assert_parse_dimensions! {
-        Units, parse_dimensions,
+        ident {
+            "auto" => Units::Auto,
+        }
 
-        "px" => Units::Pixels,
-        "in" => Units::Pixels(LengthValue::PX_PER_IN),
-        "cm" => Units::Pixels(LengthValue::PX_PER_CM),
-        "mm" => Units::Pixels(LengthValue::PX_PER_MM),
-        "q" => Units::Pixels(LengthValue::PX_PER_Q),
-        "pt" => Units::Pixels(LengthValue::PX_PER_PT),
-        "pc" => Units::Pixels(LengthValue::PX_PER_PC),
-        "st" => Units::Stretch,
-    }
+        percentage {
+            Units::Percentage,
+        }
 
-    assert_parse_idents! {
-        Units, parse_idents,
-
-        "auto" => Units::Auto,
+        dimension {
+            "px" => Units::Pixels,
+            "in" => Units::Pixels(LengthValue::PX_PER_IN),
+            "cm" => Units::Pixels(LengthValue::PX_PER_CM),
+            "mm" => Units::Pixels(LengthValue::PX_PER_MM),
+            "q" => Units::Pixels(LengthValue::PX_PER_Q),
+            "pt" => Units::Pixels(LengthValue::PX_PER_PT),
+            "pc" => Units::Pixels(LengthValue::PX_PER_PC),
+            "st" => Units::Stretch,
+        }
     }
 }

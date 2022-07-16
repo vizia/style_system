@@ -1,5 +1,4 @@
-
-macro_rules! define_enum_value {
+macro_rules! define_enum {
     (
         $(#[$outer:meta])*
         $vis:vis enum $name:ident {
@@ -18,7 +17,28 @@ macro_rules! define_enum_value {
             )+
         }
 
-        $crate::impl_parse_ident!($name, $($str => $name::$id,)+);
+        $crate::impl_parse! {
+            $name,
+
+            tokens {
+                ident {
+                    $($str => $name::$id,)+
+                }
+            }
+        }
+
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+
+            $crate::tests::assert_parse! {
+                $name, assert_parse,
+
+                ident {
+                    $($str => $name::$id,)+
+                }
+            }
+        }
   };
 }
 
@@ -33,20 +53,16 @@ macro_rules! define_property {
         }
     ) => {
         $(#[$outer])*
-
-        use crate::CustomProperty;
-
         #[derive(Debug, Clone, PartialEq)]
-        $vis enum $name<'i> {
+        $vis enum $name {
             $(
                 $(#[$meta])*
                 $variant($inner_ty),
             )+
-            Custom(CustomProperty<'i>),
         }
 
-        impl<'i> $name<'i> {
-            pub fn parse_value<'t>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
+        impl $name {
+            pub fn parse_value<'i, 't>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
                 let location = input.current_source_location();
                 match name {
                     $(
@@ -64,5 +80,5 @@ macro_rules! define_property {
     };
 }
 
-pub(crate) use define_enum_value;
+pub(crate) use define_enum;
 pub(crate) use define_property;

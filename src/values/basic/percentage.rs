@@ -1,27 +1,29 @@
-use crate::{impl_parse_expect, Calc, Parse};
+use crate::{impl_from, impl_parse, Calc, Parse};
 use cssparser::Token;
 
 /// A percentage value.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Percentage(pub f32);
 
-impl_parse_expect! {
+impl_parse! {
     Percentage,
-    Token::Percentage { unit_value, .. } => Percentage(*unit_value),
-}
 
-impl std::convert::Into<Calc<Percentage>> for Percentage {
-    fn into(self) -> Calc<Percentage> {
-        Calc::Value(Box::new(self))
+    tokens {
+        custom {
+            Token::Percentage { unit_value, .. } => Percentage(*unit_value),
+        }
     }
 }
 
-impl std::convert::From<Calc<Percentage>> for Percentage {
-    fn from(calc: Calc<Percentage>) -> Percentage {
-        match calc {
-            Calc::Value(v) => *v,
-            _ => unreachable!(),
-        }
+impl_from! {
+    Percentage,
+
+    from {
+        Calc<Percentage> => |x| match x { Calc::Value(v) => *v, _ => unreachable!(), },
+    }
+
+    into {
+        Calc<Percentage> => |x| Calc::Value(Box::new(x)),
     }
 }
 
@@ -62,10 +64,13 @@ impl std::cmp::PartialOrd<Percentage> for Percentage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_percentages;
+    use crate::tests::assert_parse;
 
-    assert_parse_percentages! {
-        Percentage, parse_percentages,
-        Percentage,
+    assert_parse! {
+        Percentage, assert_percentage,
+
+        percentage {
+            Percentage,
+        }
     }
 }

@@ -1,4 +1,4 @@
-use crate::{macros::impl_parse_try_parse, Parse};
+use crate::{impl_from, macros::impl_parse, Parse};
 
 /// A color value.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -9,17 +9,28 @@ pub enum Color {
     RGBA(RGBA),
 }
 
-impl_parse_try_parse! {
+impl_parse! {
     Color,
-    cssparser::Color,
+
+    try_parse {
+        cssparser::Color,
+    }
 }
 
-impl From<cssparser::Color> for Color {
-    fn from(color: cssparser::Color) -> Self {
-        match color {
+impl_from! {
+    Color,
+
+    from {
+        cssparser::Color => |x| match x {
             cssparser::Color::CurrentColor => Color::CurrentColor,
             cssparser::Color::RGBA(rgba) => Color::RGBA(rgba.into()),
-        }
+        },
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self::CurrentColor
     }
 }
 
@@ -37,9 +48,11 @@ pub struct RGBA {
     pub alpha: u8,
 }
 
-impl From<cssparser::RGBA> for RGBA {
-    fn from(rgba: cssparser::RGBA) -> Self {
-        Self::rgba(rgba.red, rgba.green, rgba.blue, rgba.alpha)
+impl_from! {
+    RGBA,
+
+    from {
+        cssparser::RGBA => |x: cssparser::RGBA| Self::rgba(x.red, x.green, x.blue, x.alpha),
     }
 }
 
@@ -274,17 +287,17 @@ fn hue(mut h: f32, m1: f32, m2: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::{assert_parse, color};
 
-    assert_parse_value! {
+    assert_parse! {
         Color, color,
 
         success {
-            "#000000" => Color::RGBA(RGBA::rgb(0, 0, 0)),
-            "#FFFFFF" => Color::RGBA(RGBA::rgb(255, 255, 255)),
-            "#123456" => Color::RGBA(RGBA::rgb(18, 52, 86)),
-            "rgba(12, 34, 56, 0.3)" => Color::RGBA(RGBA::rgba(12, 34, 56, 77)),
-            "red" => Color::RGBA(RGBA::rgb(255, 0, 0)),
+            "#000000" => color!(0, 0, 0),
+            "#FFFFFF" => color!(255, 255, 255),
+            "#123456" => color!(18, 52, 86),
+            "rgba(12, 34, 56, 0.3)" => color!(12, 34, 56, 77),
+            "red" => color!(255, 0, 0),
         }
 
         failure {

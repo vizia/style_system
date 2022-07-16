@@ -50,6 +50,26 @@ define_property! {
         "child-bottom": ChildBottom(Units),
         "row-between": RowBetween(Units),
         "col-between": ColBetween(Units),
+        // ----- Border -----
+
+        // Border Shorthand
+        // TODO: Support coloring and styling individual borders and enable this.
+        // "border": Border(Border),
+
+        // Border Color
+        "border-color": BorderColor(BorderColor),
+        // TODO: Support coloring individual borders.
+        // "border-top-color": BorderTopColor(Color),
+        // "border-right-color": BorderRightColor(Color),
+        // "border-bottom-color": BorderBottomColor(Color),
+        // "border-left-color": BorderLeftColor(Color),
+
+        // Border Corner Shape
+        "border-corner-shape": BorderCornerShape(BorderCornerShape),
+        "border-top-left-shape": BorderTopLeftShape(BorderCornerShape),
+        "border-top-right-shape": BorderTopRightShape(BorderCornerShape),
+        "border-bottom-left-shape": BorderBottomLeftShape(BorderCornerShape),
+        "border-bottom-right-shape": BorderBottomRightShape(BorderCornerShape),
 
         // Border Radius
         "border-radius": BorderRadius(BorderRadius),
@@ -70,6 +90,51 @@ define_property! {
         "border-top-right-shape": BorderTopRightShape(BorderCornerShape),
         "border-bottom-left-shape": BorderBottomLeftShape(BorderCornerShape),
         "border-bottom-right-shape": BorderBottomRightShape(BorderCornerShape),
+        // Border Style
+        // TODO: Support styling borders.
+        // "border-style": BorderStyle(BorderStyle),
+        // "border-top-style": BorderTopStyle(BorderStyleKeyword),
+        // "border-right-style": BorderRightStyle(BorderStyleKeyword),
+        // "border-bottom-style": BorderBottomStyle(BorderStyleKeyword),
+        // "border-left-style": BorderLeftStyle(BorderStyleKeyword),
+
+        // Border Width
+        "border-width": BorderWidth(BorderWidth),
+        "border-top-width": BorderTopWidth(BorderWidthValue),
+        "border-right-width": BorderRightWidth(BorderWidthValue),
+        "border-bottom-width": BorderBottomWidth(BorderWidthValue),
+        "border-left-width": BorderLeftWidth(BorderWidthValue),
+
+
+        // ----- Outline -----
+
+        // Outline Shorthand
+        // TODO: Support coloring and styling individual outlines.
+        // "outline": Outline(Outline),
+
+        // Outline Color
+        "outline-color": OutlineColor(BorderColor),
+        // TODO: Support coloring individual outlines.
+        // "outline-top-color": OutlineTopColor(Color),
+        // "outline-right-color": OutlineRightColor(Color),
+        // "outline-bottom-color": OutlineBottomColor(Color),
+        // "outline-left-color": OutlineLeftColor(Color),
+
+        // Outline Style
+        // TODO: Support styling outlines.
+        // "outline-style": OutlineStyle(BorderStyle),
+        // "outline-top-style": OutlineTopStyle(BorderStyleKeyword),
+        // "outline-right-style": OutlineRightStyle(BorderStyleKeyword),
+        // "outline-bottom-style": OutlineBottomStyle(BorderStyleKeyword),
+        // "outline-left-style": OutlineLeftStyle(BorderStyleKeyword),
+
+        // Outline Width
+        "outline-width": OutlineWidth(BorderWidth),
+        "outline-top-width": OutlineTopWidth(BorderWidthValue),
+        "outline-right-width": OutlineRightWidth(BorderWidthValue),
+        "outline-bottom-width": OutlineBottomWidth(BorderWidthValue),
+        "outline-left-width": OutlineLeftWidth(BorderWidthValue),
+
 
         // Background
         "background-color": BackgroundColor(Color),

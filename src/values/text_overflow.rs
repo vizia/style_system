@@ -1,6 +1,6 @@
-use crate::{define_enum_value, Parse};
+use crate::{define_enum, Parse};
 
-define_enum_value! {
+define_enum! {
     /// Determines how overflowed content that is not displayed should be signaled to the user.
     pub enum TextOverflow {
         /// The text is clipped and not accessible.

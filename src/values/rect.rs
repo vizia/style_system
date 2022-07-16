@@ -56,21 +56,23 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::assert_parse_value;
+    use crate::tests::assert_parse;
 
-    assert_parse_value! {
-        Rect<u8>, rect,
+    assert_parse! {
+        Rect<u8>, assert_rect,
 
-        success {
-            "1" => Rect(1, 1, 1, 1),
-            "1 2" => Rect(1, 2, 1, 2),
-            "1 2 3" => Rect(1, 2, 3, 2),
-            "1 2 3 4" => Rect(1, 2, 3, 4),
-        }
+        custom {
+            success {
+                "1" => Rect(1, 1, 1, 1),
+                "1 2" => Rect(1, 2, 1, 2),
+                "1 2 3" => Rect(1, 2, 3, 2),
+                "1 2 3 4" => Rect(1, 2, 3, 4),
+            }
 
-        failure {
-            "1 2 3 4 5",
-            "test",
+            failure {
+                "1 2 3 4 5",
+                "test",
+            }
         }
     }
 }

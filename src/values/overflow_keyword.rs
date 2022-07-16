@@ -1,6 +1,6 @@
-use crate::{define_enum_value, Parse};
+use crate::{define_enum, Parse};
 
-define_enum_value! {
+define_enum! {
     /// Determines how to deal with content that overflows the bounding box of the element.
     pub enum OverflowKeyword {
         /// The overflow is not clipped and renders outside of the bounding box of the element.
