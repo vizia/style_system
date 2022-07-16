@@ -1,11 +1,73 @@
-use cssparser::{CowRcStr, Token};
+use cssparser::{BasicParseErrorKind, CowRcStr, ParseError, ParseErrorKind, Token};
 use parcel_selectors::parser::SelectorParseErrorKind;
+use std::fmt;
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Error<T> {
+    pub kind: T,
+    pub location: Option<ErrorLocation>,
+}
+
+impl<T: fmt::Display> fmt::Display for Error<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.kind.fmt(f)?;
+        if let Some(loc) = &self.location {
+            write!(f, " at {}", loc)?;
+        }
+        Ok(())
+    }
+}
+
+impl<T: fmt::Display + fmt::Debug> std::error::Error for Error<T> {}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct ErrorLocation {
+    /// The filename in which the error occurred.
+    pub filename: String,
+    /// The line number, starting from 0.
+    pub line: u32,
+    /// The column number, starting from 1.
+    pub column: u32,
+}
+
+impl ErrorLocation {
+    /// Create a new error location from a source location and filename.
+    pub fn new(loc: Location, filename: String) -> Self {
+        ErrorLocation {
+            filename,
+            line: loc.line,
+            column: loc.column,
+        }
+    }
+}
+
+impl fmt::Display for ErrorLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{}:{}", self.filename, self.line, self.column)
+    }
+}
+
+/// A source location.
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
+pub struct Location {
+    /// The line number, starting at 0.
+    pub line: u32,
+    /// The column number within a line, starting at 1 for first the character of the line.
+    /// Column numbers are counted in UTF-16 code units.
+    pub column: u32,
+}
 
 #[derive(Debug, PartialEq)]
 pub enum CustomParseError<'i> {
     InvalidValue,
     InvalidDeclaration,
+    InvalidNesting,
     SelectorError(SelectorError<'i>),
+    EndOfInput,
+    UnexpectedToken(Token<'i>),
+    AtRuleInvalid(CowRcStr<'i>),
+    AtRuleBodyInvalid,
+    QualifiedRuleInvalid,
 }
 
 impl<'i> From<SelectorParseErrorKind<'i>> for CustomParseError<'i> {
@@ -121,6 +183,36 @@ impl<'i> SelectorError<'i> {
         InvalidPseudoClassAfterWebKitScrollbar => "Invalid pseudo class after ::-webkit-scrollbar pseudo element".into(),
         InvalidPseudoClassAfterPseudoElement => "Invalid pseudo class after pseudo element. Only user action pseudo classes (e.g. :hover, :active) are allowed.".into(),
         err => format!("Error parsing selector: {:?}", err)
+        }
+    }
+}
+
+impl<'i> Error<CustomParseError<'i>> {
+    /// Creates an error from a cssparser error.
+    pub fn from(
+        err: ParseError<'i, CustomParseError<'i>>,
+        filename: String,
+    ) -> Error<CustomParseError<'i>> {
+        let kind = match err.kind {
+            ParseErrorKind::Basic(b) => match &b {
+                BasicParseErrorKind::UnexpectedToken(t) => {
+                    CustomParseError::UnexpectedToken(t.clone())
+                }
+                BasicParseErrorKind::EndOfInput => CustomParseError::EndOfInput,
+                BasicParseErrorKind::AtRuleInvalid(a) => CustomParseError::AtRuleInvalid(a.clone()),
+                BasicParseErrorKind::AtRuleBodyInvalid => CustomParseError::AtRuleBodyInvalid,
+                BasicParseErrorKind::QualifiedRuleInvalid => CustomParseError::QualifiedRuleInvalid,
+            },
+            ParseErrorKind::Custom(c) => c,
+        };
+
+        Error {
+            kind,
+            location: Some(ErrorLocation {
+                filename,
+                line: err.location.line,
+                column: err.location.column,
+            }),
         }
     }
 }
