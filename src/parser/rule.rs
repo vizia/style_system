@@ -351,39 +351,39 @@ impl<'a, 'o, 'b, 'i> QualifiedRuleParser<'i> for StyleRuleParser<'a, 'o, 'i> {
     type Prelude = SelectorList<'i, Selectors>;
     type QualifiedRule = ();
     type Error = CustomParseError<'i>;
-  
+
     fn parse_prelude<'t>(
-      &mut self,
-      input: &mut Parser<'i, 't>,
+        &mut self,
+        input: &mut Parser<'i, 't>,
     ) -> Result<Self::Prelude, ParseError<'i, Self::Error>> {
-      let selector_parser = SelectorParser {
-        default_namespace: self.default_namespace,
-        is_nesting_allowed: true,
-      };
-      SelectorList::parse(&selector_parser, input, NestingRequirement::Prefixed)
+        let selector_parser = SelectorParser {
+            default_namespace: self.default_namespace,
+            is_nesting_allowed: true,
+        };
+        SelectorList::parse(&selector_parser, input, NestingRequirement::Prefixed)
     }
-  
+
     fn parse_block<'t>(
-      &mut self,
-      selectors: Self::Prelude,
-      start: &ParserState,
-      input: &mut Parser<'i, 't>,
+        &mut self,
+        selectors: Self::Prelude,
+        start: &ParserState,
+        input: &mut Parser<'i, 't>,
     ) -> Result<(), ParseError<'i, Self::Error>> {
-      let loc = start.source_location();
-      let (declarations, rules) =
-        parse_declarations_and_nested_rules(input, self.default_namespace, self.options)?;
-      self.rules.0.push(CssRule::Style(StyleRule {
-        selectors,
-        declarations,
-        rules,
-        loc: Location {
-          line: loc.line,
-          column: loc.column,
-        },
-      }));
-      Ok(())
+        let loc = start.source_location();
+        let (declarations, rules) =
+            parse_declarations_and_nested_rules(input, self.default_namespace, self.options)?;
+        self.rules.0.push(CssRule::Style(StyleRule {
+            selectors,
+            declarations,
+            rules,
+            loc: Location {
+                line: loc.line,
+                column: loc.column,
+            },
+        }));
+        Ok(())
     }
-  }
+}
 
 // #[derive(Debug)]
 // pub struct RuleParser;
