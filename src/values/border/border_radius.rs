@@ -1,4 +1,4 @@
-use crate::{impl_from, macros::impl_parse, Length, Parse, Rect};
+use crate::{macros::impl_parse, Length, Parse, Rect};
 
 /// Defines the border radius of every corner of a rectangle.
 #[derive(Debug, Clone, PartialEq)]
@@ -13,6 +13,22 @@ pub struct BorderRadius {
     pub bottom_left: Length,
 }
 
+impl BorderRadius {
+    pub fn new(
+        top_left: Length,
+        top_right: Length,
+        bottom_right: Length,
+        bottom_left: Length,
+    ) -> Self {
+        Self {
+            top_left,
+            top_right,
+            bottom_right,
+            bottom_left,
+        }
+    }
+}
+
 impl_parse! {
     BorderRadius,
 
@@ -21,32 +37,25 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    BorderRadius,
-
-    from {
-        Rect<Length> => |x: Rect<Length>| BorderRadius {
-            top_left: x.0,
-            top_right: x.1,
-            bottom_right: x.2,
-            bottom_left: x.3
-        },
+impl From<Rect<Length>> for BorderRadius {
+    fn from(rect: Rect<Length>) -> Self {
+        BorderRadius::new(rect.0, rect.1, rect.2, rect.3)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, border_radius};
+    use crate::tests::assert_parse;
 
     assert_parse! {
         BorderRadius, assert_border_radius,
 
         success {
-            "10px" => border_radius!(Px(10.0), Px(10.0), Px(10.0), Px(10.0)),
-            "10px 20px" => border_radius!(Px(10.0), Px(20.0), Px(10.0), Px(20.0)),
-            "10px 20px 30px" => border_radius!(Px(10.0), Px(20.0), Px(30.0), Px(20.0)),
-            "10px 20px 30px 40px" => border_radius!(Px(10.0), Px(20.0), Px(30.0), Px(40.0)),
+            "10px" => BorderRadius::new(Length::px(10.0), Length::px(10.0), Length::px(10.0), Length::px(10.0)),
+            "10px 20px" =>  BorderRadius::new(Length::px(10.0), Length::px(20.0), Length::px(10.0), Length::px(20.0)),
+            "10px 20px 30px" =>  BorderRadius::new(Length::px(10.0), Length::px(20.0), Length::px(30.0), Length::px(20.0)),
+            "10px 20px 30px 40px" =>  BorderRadius::new(Length::px(10.0), Length::px(20.0), Length::px(30.0), Length::px(40.0)),
         }
 
         failure {

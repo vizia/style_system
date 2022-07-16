@@ -1,4 +1,4 @@
-use crate::{impl_from, macros::impl_parse, Parse};
+use crate::{macros::impl_parse, Parse};
 
 /// A color value.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -9,6 +9,20 @@ pub enum Color {
     RGBA(RGBA),
 }
 
+impl Color {
+    /// Creates a new RGBA from RGB values
+    #[must_use]
+    pub const fn rgb(red: u8, green: u8, blue: u8) -> Self {
+        Self::RGBA(RGBA::rgb(red, green, blue))
+    }
+
+    /// Creates a new RGBA from RGBA values
+    #[must_use]
+    pub const fn rgba(red: u8, green: u8, blue: u8, alpha: u8) -> Self {
+        Self::RGBA(RGBA::rgba(red, green, blue, alpha))
+    }
+}
+
 impl_parse! {
     Color,
 
@@ -17,14 +31,12 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Color,
-
-    from {
-        cssparser::Color => |x| match x {
+impl From<cssparser::Color> for Color {
+    fn from(color: cssparser::Color) -> Self {
+        match color {
             cssparser::Color::CurrentColor => Color::CurrentColor,
             cssparser::Color::RGBA(rgba) => Color::RGBA(rgba.into()),
-        },
+        }
     }
 }
 
@@ -48,11 +60,9 @@ pub struct RGBA {
     pub alpha: u8,
 }
 
-impl_from! {
-    RGBA,
-
-    from {
-        cssparser::RGBA => |x: cssparser::RGBA| Self::rgba(x.red, x.green, x.blue, x.alpha),
+impl From<cssparser::RGBA> for RGBA {
+    fn from(rgba: cssparser::RGBA) -> Self {
+        Self::rgba(rgba.red, rgba.green, rgba.blue, rgba.alpha)
     }
 }
 
@@ -287,17 +297,17 @@ fn hue(mut h: f32, m1: f32, m2: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, color};
+    use crate::tests::assert_parse;
 
     assert_parse! {
         Color, color,
 
         success {
-            "#000000" => color!(0, 0, 0),
-            "#FFFFFF" => color!(255, 255, 255),
-            "#123456" => color!(18, 52, 86),
-            "rgba(12, 34, 56, 0.3)" => color!(12, 34, 56, 77),
-            "red" => color!(255, 0, 0),
+            "#000000" => Color::rgb(0, 0, 0),
+            "#FFFFFF" => Color::rgb(255, 255, 255),
+            "#123456" => Color::rgb(18, 52, 86),
+            "rgba(12, 34, 56, 0.3)" => Color::rgba(12, 34, 56, 77),
+            "red" => Color::rgb(255, 0, 0),
         }
 
         failure {

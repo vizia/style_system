@@ -22,8 +22,8 @@ impl_parse! {
                 _ => {}
             }
 
-            let len = LengthValue::parse(input)?;
-            Ok(Length::Value(len))
+            let length = LengthValue::parse(input)?;
+            Ok(Length::Value(length))
         }
     }
 }

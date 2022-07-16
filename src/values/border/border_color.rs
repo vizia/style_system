@@ -1,4 +1,4 @@
-use crate::{impl_from, macros::impl_parse, Color, Parse, Rect};
+use crate::{macros::impl_parse, Color, Parse, Rect};
 
 /// Defines the color of every border of a rectangle.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -13,6 +13,17 @@ pub struct BorderColor {
     pub left: Color,
 }
 
+impl BorderColor {
+    pub fn new(top: Color, right: Color, bottom: Color, left: Color) -> Self {
+        Self {
+            top,
+            right,
+            bottom,
+            left,
+        }
+    }
+}
+
 impl_parse! {
     BorderColor,
 
@@ -21,32 +32,25 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    BorderColor,
-
-    from {
-        Rect<Color> => |x: Rect<Color>| BorderColor {
-            top: x.0,
-            right: x.1,
-            bottom: x.2,
-            left: x.3
-        },
+impl From<Rect<Color>> for BorderColor {
+    fn from(rect: Rect<Color>) -> Self {
+        BorderColor::new(rect.0, rect.1, rect.2, rect.3)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, border_color};
+    use crate::tests::assert_parse;
 
     assert_parse! {
         BorderColor, assert_border_color,
 
         success {
-            "#000000" => border_color!((0, 0, 0, 255), (0, 0, 0, 255), (0, 0, 0, 255), (0, 0, 0, 255)),
-            "#FF00FF #00FF00" => border_color!((255, 0, 255, 255), (0, 255, 0, 255), (255, 0, 255, 255), (0, 255, 0, 255)),
-            "#FF00FF #00FF00 #00FFFF" => border_color!((255, 0, 255, 255), (0, 255, 0, 255), (0, 255, 255, 255), (0, 255, 0, 255)),
-            "#FF00FF #00FF00 #00FFFF #FFFFFF" => border_color!((255, 0, 255, 255), (0, 255, 0, 255), (0, 255, 255, 255), (255, 255, 255, 255)),
+            "#000000" => BorderColor::new(Color::rgb(0, 0, 0), Color::rgb(0, 0, 0), Color::rgb(0, 0, 0), Color::rgb(0, 0, 0)),
+            "#FF00FF #00FF00" => BorderColor::new(Color::rgb(255, 0, 255), Color::rgb(0, 255, 0), Color::rgb(255, 0, 255), Color::rgb(0, 255, 0)),
+            "#FF00FF #00FF00 #00FFFF" => BorderColor::new(Color::rgb(255, 0, 255), Color::rgb(0, 255, 0), Color::rgb(0, 255, 255), Color::rgb(0, 255, 0)),
+            "#FF00FF #00FF00 #00FFFF #FFFFFF" => BorderColor::new(Color::rgb(255, 0, 255), Color::rgb(0, 255, 0), Color::rgb(0, 255, 255), Color::rgb(255, 255, 255)),
         }
 
         failure {

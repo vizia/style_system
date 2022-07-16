@@ -1,8 +1,7 @@
 use crate::{
-    border_corner_shape::BorderCornerShape, box_shadow::BoxShadow, color::Color,
-    cursor_icon::CursorIcon, display::Display, layout_type::LayoutType, macros::define_property,
-    overflow::Overflow, position_type::PositionType, transition::Transition, units::Units,
-    visibility::Visibility, BorderRadius, CustomParseError, FontSize, Length, Opacity, Parse,
+    define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth, BorderWidthValue,
+    BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize, LayoutType, Length, Opacity,
+    Overflow, Parse, PositionType, Transform, Transition, Units, Visibility,
 };
 use cssparser::Parser;
 
@@ -165,10 +164,10 @@ define_property! {
         "transition": Transition(Vec<Transition>),
         "z-index": ZIndex(i32),
 
-        // // TODO
-        // // Translate((f32, f32)),
-        // // Rotate(f32),
-        // // Scale((f32, f32)),
+        // Transform
+        "transform": Transform(Vec<Transform>),
+
+        // Cursor
         "cursor": Cursor(CursorIcon),
     }
 }

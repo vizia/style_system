@@ -1,4 +1,4 @@
-use crate::{impl_from, impl_parse, OverflowKeyword, Parse, Rect};
+use crate::{impl_parse, OverflowKeyword, Parse, Rect};
 
 /// Determines how to deal with content that overflows the bounding box of the element on the x and y axis.
 #[derive(Debug, Clone, PartialEq)]
@@ -9,6 +9,12 @@ pub struct Overflow {
     pub y: OverflowKeyword,
 }
 
+impl Overflow {
+    pub fn new(x: OverflowKeyword, y: OverflowKeyword) -> Self {
+        Self { x, y }
+    }
+}
+
 impl_parse! {
     Overflow,
 
@@ -17,39 +23,37 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Overflow,
-
-    from {
-        Rect<OverflowKeyword> => |x: Rect<OverflowKeyword>| Overflow {
-            x: x.0,
-            y: x.1,
-        },
+impl From<Rect<OverflowKeyword>> for Overflow {
+    fn from(rect: Rect<OverflowKeyword>) -> Self {
+        Overflow {
+            x: rect.0,
+            y: rect.1,
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{assert_parse, overflow};
+    use crate::{tests::assert_parse, OverflowKeyword::*};
 
     assert_parse! {
         Overflow, parse_value,
 
         custom {
             success {
-                "visible" => overflow!(Visible, Visible),
-                "hidden" => overflow!(Hidden, Hidden),
-                "clip" => overflow!(Clip, Clip),
-                "scroll" => overflow!(Scroll, Scroll),
-                "visible visible" => overflow!(Visible, Visible),
-                "hidden hidden" => overflow!(Hidden, Hidden),
-                "clip clip" => overflow!(Clip, Clip),
-                "scroll scroll" => overflow!(Scroll, Scroll),
-                "visible hidden" => overflow!(Visible, Hidden),
-                "hidden clip" => overflow!(Hidden, Clip),
-                "clip scroll" => overflow!(Clip, Scroll),
-                "scroll visible" => overflow!(Scroll, Visible),
+                "visible" => Overflow::new(Visible, Visible),
+                "hidden" => Overflow::new(Hidden, Hidden),
+                "clip" => Overflow::new(Clip, Clip),
+                "scroll" => Overflow::new(Scroll, Scroll),
+                "visible visible" => Overflow::new(Visible, Visible),
+                "hidden hidden" => Overflow::new(Hidden, Hidden),
+                "clip clip" => Overflow::new(Clip, Clip),
+                "scroll scroll" => Overflow::new(Scroll, Scroll),
+                "visible hidden" => Overflow::new(Visible, Hidden),
+                "hidden clip" => Overflow::new(Hidden, Clip),
+                "clip scroll" => Overflow::new(Clip, Scroll),
+                "scroll visible" => Overflow::new(Scroll, Visible),
             }
 
             failure {

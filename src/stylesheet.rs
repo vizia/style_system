@@ -119,6 +119,10 @@ button label {
     outline-top-right-shape: bevel;
     outline-radius: 2px;
     outline-bottom-left-radius: 10px;
+    transform: rotate(10deg);
+    transform: scale(20%, 30);
+    transform: scale(20%, 30) rotate(50rad);
+    transform: scale(20%, 30) rotate(50rad) skew(50deg, 30turn);
 }
 
 test {

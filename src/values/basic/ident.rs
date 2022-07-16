@@ -1,9 +1,4 @@
-use cssparser::*;
-
-use crate::{
-    macros::{impl_from, impl_parse},
-    Parse, CustomParseError,
-};
+use crate::{macros::impl_parse, Parse};
 
 /// A simple ident.
 #[derive(Debug, Clone, PartialEq)]
@@ -19,15 +14,15 @@ impl_parse! {
     }
 }
 
-impl_from! {
-    Ident,
-
-    from {
-        String => |x| Ident(x),
+impl From<String> for Ident {
+    fn from(string: String) -> Self {
+        Ident(string)
     }
+}
 
-    into {
-        String => |x: Ident| x.0,
+impl From<Ident> for String {
+    fn from(ident: Ident) -> Self {
+        ident.0
     }
 }
 
