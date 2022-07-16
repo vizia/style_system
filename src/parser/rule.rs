@@ -1,11 +1,15 @@
 use std::marker::PhantomData;
 
 use crate::{
-    parser::declaration::DeclarationParser, CssRule, CssRuleList, CustomParseError, DashedIdent,
-    Parse, ParserOptions, Property, SelectorParser, Selectors, Location, StyleRule, DeclarationBlock, DeclarationList, parse_declaration,
+    parse_declaration, parser::declaration::DeclarationParser, CssRule, CssRuleList,
+    CustomParseError, DashedIdent, DeclarationBlock, DeclarationList, Location, Parse,
+    ParserOptions, Property, PropertyRule, SelectorParser, Selectors, StyleRule,
 };
 use cssparser::*;
-use parcel_selectors::{parser::{Selector, NestingRequirement}, SelectorList};
+use parcel_selectors::{
+    parser::{NestingRequirement, Selector},
+    SelectorList,
+};
 
 #[derive(PartialEq, PartialOrd)]
 enum State {
@@ -56,10 +60,10 @@ impl<'a, 'o, 'i> AtRuleParser<'i> for TopLevelRuleParser<'a, 'o, 'i> {
     ) -> Result<Self::Prelude, ParseError<'i, Self::Error>> {
         match_ignore_ascii_case! {
             &*name,
-            "property" => {
-                let name = DashedIdent::parse(input)?;
-                return Ok(AtRulePrelude::Property(name));
-            },
+            // "property" => {
+            //     let name = DashedIdent::parse(input)?;
+            //     return Ok(AtRulePrelude::Property(name));
+            // },
             _=> {}
         }
 
@@ -132,7 +136,6 @@ impl<'a, 'o, 'b, 'i> NestedRuleParser<'a, 'o, 'i> {
     fn loc(&self, start: &ParserState) -> Location {
         let loc = start.source_location();
         Location {
-            // source_index: self.options.source_index,
             line: loc.line,
             column: loc.column,
         }
@@ -158,7 +161,7 @@ impl<'a, 'o, 'b, 'i> AtRuleParser<'i> for NestedRuleParser<'a, 'o, 'i> {
     //     let loc = self.loc(start);
 
     //     match prelude {
-    //         AtRulePrelude::Property(name) => Ok(CssRule::Property())
+    //         AtRulePrelude::Property(name) => Ok(CssRule::Property(PropertyRule::parse(name, input, loc)?)),
     //     }
     // }
 }
@@ -168,7 +171,10 @@ impl<'a, 'o, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'o, 'i> {
     type QualifiedRule = CssRule<'i>;
     type Error = CustomParseError<'i>;
 
-    fn parse_prelude<'t>(&mut self, input: &mut Parser<'i, 't>) -> Result<Self::Prelude, ParseError<'i, Self::Error>> {
+    fn parse_prelude<'t>(
+        &mut self,
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self::Prelude, ParseError<'i, Self::Error>> {
         let selector_parser = SelectorParser {
             default_namespace: self.default_namespace,
             is_nesting_allowed: false,
@@ -177,14 +183,22 @@ impl<'a, 'o, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'o, 'i> {
         SelectorList::parse(&selector_parser, input, NestingRequirement::None)
     }
 
-    fn parse_block<'t>(&mut self, selectors: Self::Prelude, start: &ParserState, input: &mut Parser<'i, 't>) -> Result<Self::QualifiedRule, ParseError<'i, Self::Error>> {
+    fn parse_block<'t>(
+        &mut self,
+        selectors: Self::Prelude,
+        start: &ParserState,
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self::QualifiedRule, ParseError<'i, Self::Error>> {
         let loc = self.loc(start);
         let (declarations, rules) = if self.options.nesting {
             parse_declarations_and_nested_rules(input, self.default_namespace, self.options)?
         } else {
-            (DeclarationBlock::parse(input, self.options)?, CssRuleList(vec![]))
+            (
+                DeclarationBlock::parse(input, self.options)?,
+                CssRuleList(vec![]),
+            )
         };
-        
+
         Ok(CssRule::Style(StyleRule {
             selectors,
             declarations,
@@ -193,7 +207,6 @@ impl<'a, 'o, 'b, 'i> QualifiedRuleParser<'i> for NestedRuleParser<'a, 'o, 'i> {
         }))
     }
 }
-
 
 fn parse_declarations_and_nested_rules<'a, 'o, 'i, 't>(
     input: &mut Parser<'i, 't>,
@@ -204,6 +217,7 @@ fn parse_declarations_and_nested_rules<'a, 'o, 'i, 't>(
     let mut declarations = DeclarationList::new();
     let mut rules = CssRuleList(vec![]);
     let parser = StyleRuleParser {
+        default_namespace,
         options,
         declarations: &mut declarations,
         important_declarations: &mut important_declarations,
@@ -224,7 +238,8 @@ fn parse_declarations_and_nested_rules<'a, 'o, 'i, 't>(
         last = declaration_parser.input.state();
     }
 
-    let mut iter = RuleListParser::new_for_nested_rule(declaration_parser.input, declaration_parser.parser);
+    let mut iter =
+        RuleListParser::new_for_nested_rule(declaration_parser.input, declaration_parser.parser);
     while let Some(result) = iter.next() {
         if let Err((err, _)) = result {
             return Err(err);
@@ -240,8 +255,9 @@ fn parse_declarations_and_nested_rules<'a, 'o, 'i, 't>(
     ))
 }
 
-
+// Style Rule
 pub struct StyleRuleParser<'a, 'o, 'i> {
+    default_namespace: &'a Option<CowRcStr<'i>>,
     options: &'a ParserOptions<'o>,
     declarations: &'a mut DeclarationList<'i>,
     important_declarations: &'a mut DeclarationList<'i>,
@@ -270,6 +286,104 @@ impl<'a, 'o, 'i> cssparser::DeclarationParser<'i> for StyleRuleParser<'a, 'o, 'i
         )
     }
 }
+
+impl<'a, 'o, 'i> AtRuleParser<'i> for StyleRuleParser<'a, 'o, 'i> {
+    type Prelude = AtRulePrelude<'i>;
+    type AtRule = ();
+    type Error = CustomParseError<'i>;
+
+    fn parse_prelude<'t>(
+        &mut self,
+        name: CowRcStr<'i>,
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self::Prelude, ParseError<'i, Self::Error>> {
+        match_ignore_ascii_case! { &*name,
+            _ => Err(input.new_error(BasicParseErrorKind::AtRuleInvalid(name)))
+        }
+    }
+
+    fn parse_block<'t>(
+        &mut self,
+        prelude: Self::Prelude,
+        start: &ParserState,
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self::AtRule, ParseError<'i, Self::Error>> {
+        Err(input.new_error(BasicParseErrorKind::AtRuleBodyInvalid))
+    }
+}
+
+fn parse_nested_at_rule<'a, 'o, 'i, 't>(
+    input: &mut Parser<'i, 't>,
+    default_namespace: &'a Option<CowRcStr<'i>>,
+    options: &'a ParserOptions<'i>,
+) -> Result<CssRuleList<'i>, ParseError<'i, CustomParseError<'i>>> {
+    let loc = input.current_source_location();
+    let loc = Location {
+        line: loc.line,
+        column: loc.column,
+    };
+
+    // Declarations can be immediately within @media and @supports blocks that are nested within a parent style rule.
+    // These act the same way as if they were nested within a `& { ... }` block.
+    let (declarations, mut rules) =
+        parse_declarations_and_nested_rules(input, default_namespace, options)?;
+
+    if declarations.declarations.len() > 0 {
+        rules.0.insert(
+            0,
+            CssRule::Style(StyleRule {
+                selectors: SelectorList(smallvec::smallvec![
+                    parcel_selectors::parser::Selector::from_vec2(vec![
+                        parcel_selectors::parser::Component::Nesting
+                    ])
+                ]),
+                declarations,
+                rules: CssRuleList(vec![]),
+                loc,
+            }),
+        )
+    }
+
+    Ok(rules)
+}
+
+impl<'a, 'o, 'b, 'i> QualifiedRuleParser<'i> for StyleRuleParser<'a, 'o, 'i> {
+    type Prelude = SelectorList<'i, Selectors>;
+    type QualifiedRule = ();
+    type Error = CustomParseError<'i>;
+  
+    fn parse_prelude<'t>(
+      &mut self,
+      input: &mut Parser<'i, 't>,
+    ) -> Result<Self::Prelude, ParseError<'i, Self::Error>> {
+      let selector_parser = SelectorParser {
+        default_namespace: self.default_namespace,
+        is_nesting_allowed: true,
+      };
+      SelectorList::parse(&selector_parser, input, NestingRequirement::Prefixed)
+    }
+  
+    fn parse_block<'t>(
+      &mut self,
+      selectors: Self::Prelude,
+      start: &ParserState,
+      input: &mut Parser<'i, 't>,
+    ) -> Result<(), ParseError<'i, Self::Error>> {
+      let loc = start.source_location();
+      let (declarations, rules) =
+        parse_declarations_and_nested_rules(input, self.default_namespace, self.options)?;
+      self.rules.0.push(CssRule::Style(StyleRule {
+        selectors,
+        declarations,
+        rules,
+        loc: Location {
+          line: loc.line,
+          column: loc.column,
+        },
+      }));
+      Ok(())
+    }
+  }
 
 // #[derive(Debug)]
 // pub struct RuleParser;

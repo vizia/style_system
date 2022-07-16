@@ -1,12 +1,14 @@
-
-
 mod test {
     use std::{collections::HashMap, hash::Hash};
 
     use cssparser::*;
-    use parcel_selectors::{matching::{matches_selector, matches_selector_list}, OpaqueElement, context::{MatchingMode, MatchingContext, QuirksMode}, SelectorList};
+    use parcel_selectors::{
+        context::{MatchingContext, MatchingMode, QuirksMode},
+        matching::{matches_selector, matches_selector_list},
+        OpaqueElement, SelectorList,
+    };
 
-    use crate::{Selectors, SelectorIdent, SelectorParser, CustomParseError};
+    use crate::{CustomParseError, SelectorIdent, SelectorParser, Selectors};
 
     fn parse<'i>(
         input: &'i str,
@@ -88,15 +90,24 @@ mod test {
             false
         }
 
-        fn has_namespace(&self, ns: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::BorrowedNamespaceUrl) -> bool {
+        fn has_namespace(
+            &self,
+            ns: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::BorrowedNamespaceUrl,
+        ) -> bool {
             false
         }
 
-        fn is_part(&self, name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier) -> bool {
+        fn is_part(
+            &self,
+            name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier,
+        ) -> bool {
             false
         }
 
-        fn imported_part(&self, name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier) -> Option<<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier> {
+        fn imported_part(
+            &self,
+            name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier,
+        ) -> Option<<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier> {
             None
         }
 
@@ -112,34 +123,58 @@ mod test {
             false
         }
 
-        fn has_id(&self, id: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier, case_sensitivity: parcel_selectors::attr::CaseSensitivity) -> bool {
+        fn has_id(
+            &self,
+            id: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier,
+            case_sensitivity: parcel_selectors::attr::CaseSensitivity,
+        ) -> bool {
             false
         }
 
-        fn has_class(&self, name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier, case_sensitivity: parcel_selectors::attr::CaseSensitivity) -> bool {
+        fn has_class(
+            &self,
+            name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier,
+            case_sensitivity: parcel_selectors::attr::CaseSensitivity,
+        ) -> bool {
             false
         }
 
-        fn attr_matches(&self, ns: &parcel_selectors::attr::NamespaceConstraint<&<Self::Impl as parcel_selectors::SelectorImpl<'i>>::NamespaceUrl>, local_name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::LocalName, operation: &parcel_selectors::attr::AttrSelectorOperation<&<Self::Impl as parcel_selectors::SelectorImpl<'i>>::AttrValue>) -> bool {
+        fn attr_matches(
+            &self,
+            ns: &parcel_selectors::attr::NamespaceConstraint<
+                &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::NamespaceUrl,
+            >,
+            local_name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::LocalName,
+            operation: &parcel_selectors::attr::AttrSelectorOperation<
+                &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::AttrValue,
+            >,
+        ) -> bool {
             false
         }
 
-        fn match_pseudo_element(&self, pe: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::PseudoElement, context: &mut parcel_selectors::context::MatchingContext<'_, 'i, Self::Impl>) -> bool {
+        fn match_pseudo_element(
+            &self,
+            pe: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::PseudoElement,
+            context: &mut parcel_selectors::context::MatchingContext<'_, 'i, Self::Impl>,
+        ) -> bool {
             false
         }
 
-        fn match_non_ts_pseudo_class<F>(&self, pc: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::NonTSPseudoClass, context: &mut parcel_selectors::context::MatchingContext<'_, 'i, Self::Impl>, flags_setter: &mut F) -> bool
+        fn match_non_ts_pseudo_class<F>(
+            &self,
+            pc: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::NonTSPseudoClass,
+            context: &mut parcel_selectors::context::MatchingContext<'_, 'i, Self::Impl>,
+            flags_setter: &mut F,
+        ) -> bool
         where
-                F: FnMut(&Self, parcel_selectors::matching::ElementSelectorFlags) {
+            F: FnMut(&Self, parcel_selectors::matching::ElementSelectorFlags),
+        {
             false
         }
-
-
     }
 
     #[test]
     fn asterisk_match() {
-
         let mut store = Store {
             element: HashMap::new(),
         };
@@ -161,19 +196,10 @@ mod test {
         };
 
         if let Ok(selector_list) = parse("*") {
-            
-            let mut context = MatchingContext::new(
-                MatchingMode::Normal,
-                None,
-                None,
-                QuirksMode::NoQuirks,
-            );
-            
-            let result = matches_selector_list(
-                &selector_list,
-                &root_node,
-                &mut context,
-            );
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
 
             println!("Result: {}", result);
         }
@@ -181,7 +207,6 @@ mod test {
 
     #[test]
     fn element_match() {
-
         let mut store = Store {
             element: HashMap::new(),
         };
@@ -203,30 +228,16 @@ mod test {
         };
 
         if let Ok(selector_list) = parse("window") {
-            
-            let mut context = MatchingContext::new(
-                MatchingMode::Normal,
-                None,
-                None,
-                QuirksMode::NoQuirks,
-            );
-            
-            let result = matches_selector_list(
-                &selector_list,
-                &root_node,
-                &mut context,
-            );
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
 
             println!("Result: {}", result);
 
-            let result = matches_selector_list(
-                &selector_list,
-                &child_node,
-                &mut context,
-            );
+            let result = matches_selector_list(&selector_list, &child_node, &mut context);
 
             println!("Result: {}", result);
         }
     }
-
 }

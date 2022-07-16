@@ -1,4 +1,4 @@
-use crate::{Property, ParserOptions, CustomParseError};
+use crate::{CustomParseError, ParserOptions, Property};
 
 use cssparser::*;
 
@@ -16,17 +16,17 @@ impl<'i> DeclarationBlock<'i> {
         let mut important_declarations = DeclarationList::new();
         let mut declarations = DeclarationList::new();
         let mut parser = DeclarationListParser::new(
-        input,
-        PropertyDeclarationParser {
-            important_declarations: &mut important_declarations,
-            declarations: &mut declarations,
-            options,
-        },
+            input,
+            PropertyDeclarationParser {
+                important_declarations: &mut important_declarations,
+                declarations: &mut declarations,
+                options,
+            },
         );
         while let Some(res) = parser.next() {
-        if let Err((err, _)) = res {
-            return Err(err);
-        }
+            if let Err((err, _)) = res {
+                return Err(err);
+            }
         }
 
         Ok(DeclarationBlock {
@@ -35,7 +35,6 @@ impl<'i> DeclarationBlock<'i> {
         })
     }
 }
-
 
 struct PropertyDeclarationParser<'a, 'o, 'i> {
     declarations: &'a mut Vec<Property<'i>>,
@@ -47,11 +46,20 @@ impl<'a, 'o, 'i> DeclarationParser<'i> for PropertyDeclarationParser<'a, 'o, 'i>
     type Declaration = ();
     type Error = CustomParseError<'i>;
 
-    fn parse_value<'t>(&mut self, name: CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self::Declaration, ParseError<'i, Self::Error>> {
-        parse_declaration(name, input, &mut self.declarations, &mut self.important_declarations, &mut self.options)
+    fn parse_value<'t>(
+        &mut self,
+        name: CowRcStr<'i>,
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self::Declaration, ParseError<'i, Self::Error>> {
+        parse_declaration(
+            name,
+            input,
+            &mut self.declarations,
+            &mut self.important_declarations,
+            &mut self.options,
+        )
     }
 }
-
 
 pub(crate) fn parse_declaration<'i, 't>(
     name: CowRcStr<'i>,
@@ -66,8 +74,8 @@ pub(crate) fn parse_declaration<'i, 't>(
 
     let important = input
         .try_parse(|input| {
-        input.expect_delim('!')?;
-        input.expect_ident_matching("important")
+            input.expect_delim('!')?;
+            input.expect_ident_matching("important")
         })
         .is_ok();
 
@@ -78,7 +86,7 @@ pub(crate) fn parse_declaration<'i, 't>(
     }
     Ok(())
 }
-  
+
 pub(crate) type DeclarationList<'i> = Vec<Property<'i>>;
 
 /// Default methods reject all at rules.
@@ -87,4 +95,3 @@ impl<'a, 'o, 'i> AtRuleParser<'i> for PropertyDeclarationParser<'a, 'o, 'i> {
     type AtRule = ();
     type Error = CustomParseError<'i>;
 }
-

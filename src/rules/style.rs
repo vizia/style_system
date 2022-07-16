@@ -1,6 +1,6 @@
 use parcel_selectors::SelectorList;
 
-use crate::{CssRuleList, Location, Selectors, DeclarationBlock};
+use crate::{CssRuleList, DeclarationBlock, Location, Selectors};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StyleRule<'i> {

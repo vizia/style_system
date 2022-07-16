@@ -1,12 +1,12 @@
 use crate::{
     define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth, BorderWidthValue,
-    BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize, LayoutType, Length, Opacity,
-    Overflow, Parse, PositionType, Transform, Transition, Units, Visibility,
+    BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty, Display, FontSize, LayoutType,
+    Length, Opacity, Overflow, Parse, PositionType, Transform, Transition, Units, Visibility,
 };
 use cssparser::Parser;
 
 define_property! {
-    pub enum Property {
+    pub enum Property<'i> {
         // General
         "display": Display(Display),
         "visibility": Visibility(Visibility),
@@ -77,18 +77,6 @@ define_property! {
         "border-bottom-left-radius": BorderBottomLeftRadius(Length),
         "border-bottom-right-radius": BorderBottomRightRadius(Length),
 
-        // Border Width
-        "border-width": BorderWidth(Length),
-
-        // Border Color
-        "border-color": BorderColor(Color),
-
-        // Border Shape
-        "border-corner-shape": BorderCornerShape(BorderCornerShape),
-        "border-top-left-shape": BorderTopLeftShape(BorderCornerShape),
-        "border-top-right-shape": BorderTopRightShape(BorderCornerShape),
-        "border-bottom-left-shape": BorderBottomLeftShape(BorderCornerShape),
-        "border-bottom-right-shape": BorderBottomRightShape(BorderCornerShape),
         // Border Style
         // TODO: Support styling borders.
         // "border-style": BorderStyle(BorderStyle),
@@ -169,6 +157,7 @@ define_property! {
 
         // Cursor
         "cursor": Cursor(CursorIcon),
+        "custom": Custom(CustomProperty<'i>),
     }
 }
 
@@ -183,7 +172,7 @@ mod tests {
         let mut parser_input = ParserInput::new("red");
         let mut parser = Parser::new(&mut parser_input);
         let parsed_property = Property::parse_value("background-color", &mut parser);
-        
+
         println!("{:?}", parsed_property);
     }
 }
