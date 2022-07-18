@@ -1,5 +1,6 @@
 use crate::{
-    Angle, CustomParseError, Length, LengthOrPercentage, Matrix, Parse, PercentageOrNumber,
+    Angle, CustomParseError, Length, LengthOrPercentage, Matrix, Parse, PercentageOrNumber, Scale,
+    Translate,
 };
 use cssparser::{
     match_ignore_ascii_case, ParseError, Parser, Token, _cssparser_internal_to_lowercase,
@@ -9,13 +10,13 @@ use cssparser::{
 #[derive(Debug, PartialEq, Clone)]
 pub enum Transform {
     /// A 2D translation.
-    Translate(LengthOrPercentage, LengthOrPercentage),
+    Translate(Translate),
     /// A translation in the X direction.
     TranslateX(LengthOrPercentage),
     /// A translation in the Y direction.
     TranslateY(LengthOrPercentage),
     /// A 2D scale.
-    Scale(PercentageOrNumber, PercentageOrNumber),
+    Scale(Scale),
     /// A scale in the X direction.
     ScaleX(PercentageOrNumber),
     /// A scale in the Y direction.
@@ -47,10 +48,8 @@ impl<'i> Parse<'i> for Transform {
 
             match_ignore_ascii_case! { &function,
                 "translate" => {
-                    let x = LengthOrPercentage::parse(input)?;
-                    input.expect_comma()?;
-                    let y =  LengthOrPercentage::parse(input)?;
-                    Ok(Transform::Translate(x, y))
+                    let translate = Translate::parse(input)?;
+                    Ok(Transform::Translate(translate))
                 },
                 "translatex" => {
                     let x = LengthOrPercentage::parse(input)?;
@@ -61,10 +60,8 @@ impl<'i> Parse<'i> for Transform {
                     Ok(Transform::TranslateY(y))
                 },
                 "scale" => {
-                    let x = PercentageOrNumber::parse(input)?;
-                    input.expect_comma()?;
-                    let y = PercentageOrNumber::parse(input)?;
-                    Ok(Transform::Scale(x, y))
+                    let scale = Scale::parse(input)?;
+                    Ok(Transform::Scale(scale))
                 },
                 "scalex" => {
                     let x = PercentageOrNumber::parse(input)?;
@@ -148,11 +145,11 @@ mod tests {
 
         custom {
             success {
-                "translate(10px, 50%)" => Transform::Translate(LengthOrPercentage::Length(Length::px(10.0)), LengthOrPercentage::Percentage(0.5)),
+                "translate(10px, 50%)" => Transform::Translate(Translate::new(LengthOrPercentage::Length(Length::px(10.0)), LengthOrPercentage::Percentage(0.5))),
                 "translatex(20px)" => Transform::TranslateX(LengthOrPercentage::Length(Length::px(20.0))),
                 "translatey(10%)" => Transform::TranslateY(LengthOrPercentage::Percentage(0.1)),
 
-                "scale(20, 30%)" => Transform::Scale(PercentageOrNumber::Number(20.0), PercentageOrNumber::Percentage(0.3)),
+                "scale(20, 30%)" => Transform::Scale(Scale::new(PercentageOrNumber::Number(20.0), PercentageOrNumber::Percentage(0.3))),
                 "scalex(40)" => Transform::ScaleX(PercentageOrNumber::Number(40.0)),
                 "scaley(50%)" => Transform::ScaleY(PercentageOrNumber::Percentage(0.5)),
 
@@ -187,8 +184,8 @@ mod tests {
             success {
                 "translate(10px, 20%) scale(30%, 40) rotate(50grad) skew(60turn, 70rad) perspective(80cm) matrix(10, 20, 30, 40, 50, 60)" =>
                     vec![
-                        Transform::Translate(LengthOrPercentage::Length(Length::px(10.0)), LengthOrPercentage::Percentage(0.2)),
-                        Transform::Scale(PercentageOrNumber::Percentage(0.3), PercentageOrNumber::Number(40.0)),
+                        Transform::Translate(Translate::new(LengthOrPercentage::Length(Length::px(10.0)), LengthOrPercentage::Percentage(0.2))),
+                        Transform::Scale(Scale::new(PercentageOrNumber::Percentage(0.3), PercentageOrNumber::Number(40.0))),
                         Transform::Rotate(Angle::Grad(50.0)),
                         Transform::Skew(Angle::Turn(60.0), Angle::Rad(70.0)),
                         Transform::Perspective(Length::Value(LengthValue::Cm(80.0))),

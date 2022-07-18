@@ -35,13 +35,13 @@ where
             let e = fields[4].clone();
             let f = fields[5].clone();
 
-            return Ok(Self::new(a, b, c, d, e, f));
+            Ok(Self::new(a, b, c, d, e, f))
+        } else {
+            Err(cssparser::ParseError {
+                kind: cssparser::ParseErrorKind::Custom(CustomParseError::InvalidDeclaration),
+                location,
+            })
         }
-
-        Err(cssparser::ParseError {
-            kind: cssparser::ParseErrorKind::Custom(CustomParseError::InvalidDeclaration),
-            location,
-        })
     }
 }
 
