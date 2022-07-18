@@ -62,13 +62,19 @@ impl<'i> Parse<'i> for BoxShadow {
     }
 }
 
+impl<'i> Parse<'i> for Vec<BoxShadow> {
+    fn parse<'t>(input: &mut Parser<'i, 't>) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
+        input.parse_comma_separated(BoxShadow::parse)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::tests::assert_parse;
 
     assert_parse! {
-        BoxShadow, length_value,
+        BoxShadow, parse_box_shadow,
 
         custom {
             success {
@@ -91,6 +97,39 @@ mod tests {
             }
 
             failure {
+                "test",
+                "123",
+            }
+        }
+    }
+
+    assert_parse! {
+        Vec<BoxShadow>, parse_vec_box_shadow,
+
+        custom {
+            success {
+                "10px 20px, 10px 20px 30px 40px red inset" => vec![
+                    BoxShadow::new(
+                        Length::px(10.0),
+                        Length::px(20.0),
+                        None,
+                        None,
+                        None,
+                        false,
+                    ),
+                    BoxShadow::new(
+                        Length::px(10.0),
+                        Length::px(20.0),
+                        Some(Length::px(30.0)),
+                        Some(Length::px(40.0)),
+                        Some(Color::rgb(255, 0, 0)),
+                        true,
+                    ),
+                ],
+            }
+
+            failure {
+                "10px, 10px, 10px",
                 "test",
                 "123",
             }
