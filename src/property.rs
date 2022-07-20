@@ -2,6 +2,7 @@ use crate::{
     define_property, BorderColor, BorderCornerShape, BorderRadius, BorderWidth, BorderWidthValue,
     BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty, Display, FontSize, LayoutType,
     Length, Opacity, Overflow, Parse, PositionType, Transform, Transition, Units, Visibility,
+    define_property, Angle, InsetKeyword, Rect, Scale, Translate,
 };
 use cssparser::Parser;
 
@@ -12,6 +13,7 @@ define_property! {
         "visibility": Visibility(Visibility),
         "overflow": Overflow(Overflow),
         "opacity": Opacity(Opacity),
+        "z-index": ZIndex(i32),
 
         // Positioning
         "layout-type": LayoutType(LayoutType),
@@ -64,7 +66,7 @@ define_property! {
         // "border-left-color": BorderLeftColor(Color),
 
         // Border Corner Shape
-        "border-corner-shape": BorderCornerShape(BorderCornerShape),
+        "border-corner-shape": BorderCornerShape(Rect<BorderCornerShape>),
         "border-top-left-shape": BorderTopLeftShape(BorderCornerShape),
         "border-top-right-shape": BorderTopRightShape(BorderCornerShape),
         "border-bottom-left-shape": BorderBottomLeftShape(BorderCornerShape),
@@ -133,27 +135,27 @@ define_property! {
         "font-size": FontSize(FontSize),
         "font-color": FontColor(Color),
         "font": Font(String),
-        "selection-color": SelectionColor(Color),
+        "selection-color": SelectionColor(Color), // TODO: Remove this once we have the pseudoselector version.
         "caret-color": CaretColor(Color),
         "text-wrap": TextWrap(bool),
 
-        // Shadow
-        "outer-shadow": OuterShadow(BoxShadow),
-        "outer-shadow-h-offset": OuterShadowHOffset(Length),
-        "outer-shadow-v-offset": OuterShadowVOffset(Length),
-        "outer-shadow-blur": OuterShadowBlur(Length),
-        "outer-shadow-color": OuterShadowColor(Color),
+        // Box Shadow
+        "box-shadow": BoxShadow(Vec<BoxShadow>),
+        "box-shadow-x-offset": BoxShadowXOffset(Length),
+        "box-shadow-y-offset": BoxShadowYOffset(Length),
+        "box-shadow-blur-radius": BoxShadowBlurRadius(Length),
+        "box-shadow-spread-radius": BoxShadowSpreadRadius(Length),
+        "box-shadow-color": BoxShadowColor(Color),
+        "box-shadow-inset": BoxShadowInset(InsetKeyword),
 
-        "inner-shadow": InnerShadow(BoxShadow),
-        "inner-shadow-h-offset": InnerShadowHOffset(Length),
-        "inner-shadow-v-offset": InnerShadowVOffset(Length),
-        "iner-shadow-blur": InnerShadowBlur(Length),
-        "inner-shadow-color": InnerShadowColor(Color),
+        // Animations
         "transition": Transition(Vec<Transition>),
-        "z-index": ZIndex(i32),
 
         // Transform
         "transform": Transform(Vec<Transform>),
+        "translate": Translate(Translate),
+        "rotate": Rotate(Angle),
+        "scale": Scale(Scale),
 
         // Cursor
         "cursor": Cursor(CursorIcon),

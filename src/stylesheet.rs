@@ -128,6 +128,12 @@ button label {
     transform: scale(20%, 30);
     transform: scale(20%, 30) rotate(50rad);
     transform: scale(20%, 30) rotate(50rad) skew(50deg, 30turn);
+    translate: 10px, 20px;
+    rotate: 20deg;
+    scale: 20%, 10;
+    border-corner-shape: bevel round round bevel;
+    border-top-left-shape: round;
+    border-top-right-shape: bevel;
 }
 
 test {
