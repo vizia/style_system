@@ -6,7 +6,7 @@ use crate::parser::SelectorImpl;
 use cssparser::ToCss;
 use std::fmt;
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct AttrSelectorWithOptionalNamespace<'i, Impl: SelectorImpl<'i>> {
     pub namespace: Option<NamespaceConstraint<(Impl::NamespacePrefix, Impl::NamespaceUrl)>>,
     pub local_name: Impl::LocalName,
@@ -24,7 +24,7 @@ impl<'i, Impl: SelectorImpl<'i>> AttrSelectorWithOptionalNamespace<'i, Impl> {
     }
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum NamespaceConstraint<NamespaceUrl> {
     Any,
 
@@ -32,7 +32,7 @@ pub enum NamespaceConstraint<NamespaceUrl> {
     Specific(NamespaceUrl),
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ParsedAttrSelectorOperation<AttrValue> {
     Exists,
     WithValue {
@@ -72,7 +72,7 @@ impl<AttrValue> AttrSelectorOperation<AttrValue> {
     }
 }
 
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum AttrSelectorOperator {
     Equal,
     Includes,

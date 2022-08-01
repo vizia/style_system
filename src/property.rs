@@ -1,21 +1,19 @@
 use crate::{
     define_property, Angle, BorderColor, BorderCornerShape, BorderRadius, BorderWidth,
-    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, Display, FontSize,
-    InsetKeyword, LayoutType, Length, Opacity, Overflow, Parse, PositionType, Rect, Scale,
-    Transform, Transition, Translate, Units, Visibility,
+    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty, Display,
+    FontSize, InsetKeyword, LayoutType, Length, Opacity, Overflow, Parse, PositionType, Rect,
+    Scale, Transform, Transition, Translate, Units, Visibility,
 };
 use cssparser::Parser;
 
 define_property! {
-    pub enum Property {
+    pub enum Property<'i> {
         // General
         "display": Display(Display),
         "visibility": Visibility(Visibility),
         "overflow": Overflow(Overflow),
         "opacity": Opacity(Opacity),
         "z-index": ZIndex(i32),
-
-        // ----- Layout -----
 
         // Positioning
         "layout-type": LayoutType(LayoutType),
@@ -53,8 +51,6 @@ define_property! {
         "child-bottom": ChildBottom(Units),
         "row-between": RowBetween(Units),
         "col-between": ColBetween(Units),
-
-
         // ----- Border -----
 
         // Border Shorthand
@@ -163,5 +159,22 @@ define_property! {
 
         // Cursor
         "cursor": Cursor(CursorIcon),
+        "custom": Custom(CustomProperty<'i>),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use cssparser::ParserInput;
+
+    use super::*;
+
+    #[test]
+    fn parse_property() {
+        let mut parser_input = ParserInput::new("red");
+        let mut parser = Parser::new(&mut parser_input);
+        let parsed_property = Property::parse_value("background-color", &mut parser);
+
+        println!("{:?}", parsed_property);
     }
 }

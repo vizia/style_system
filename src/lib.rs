@@ -1,8 +1,8 @@
 mod values;
 pub use values::*;
 
-// mod rules;
-// pub use rules::*;
+mod rules;
+pub use rules::*;
 
 mod traits;
 pub use traits::*;
@@ -11,7 +11,10 @@ mod property;
 pub use property::*;
 
 mod macros;
-pub(crate) use macros::*;
+pub use macros::*;
+
+mod matching;
+pub use matching::*;
 
 mod error;
 pub use error::*;
@@ -24,6 +27,9 @@ pub use pseudoclass::*;
 
 mod pseudoelement;
 pub use pseudoelement::*;
+
+mod declaration;
+pub use declaration::*;
 
 mod stylesheet;
 pub use stylesheet::*;

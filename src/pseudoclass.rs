@@ -1,6 +1,6 @@
 use cssparser::*;
 
-use crate::Selectors;
+use crate::{Direction, Selectors};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PseudoClass<'i> {
@@ -25,6 +25,9 @@ pub enum PseudoClass<'i> {
     Optional,
     UserValid,
     UserInvalid,
+
+    Lang(Vec<CowRcStr<'i>>),
+    Dir(Direction),
 
     Custom(CowRcStr<'i>),
 }

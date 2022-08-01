@@ -9,7 +9,7 @@ macro_rules! define_enum {
         }
     ) => {
         $(#[$outer])*
-        #[derive(Debug, Copy, Clone, PartialEq)]
+        #[derive(Debug, Copy, Clone, PartialEq, Eq)]
         $vis enum $name {
             $(
                 $(#[$meta])*
@@ -45,7 +45,7 @@ macro_rules! define_enum {
 macro_rules! define_property {
     (
         $(#[$outer:meta])*
-        $vis:vis enum $name:ident {
+        $vis:vis enum $name:ident<'i> {
             $(
                 $(#[$meta: meta])*
                 $str: literal: $variant: ident($inner_ty: ty),
@@ -54,15 +54,15 @@ macro_rules! define_property {
     ) => {
         $(#[$outer])*
         #[derive(Debug, Clone, PartialEq)]
-        $vis enum $name {
+        $vis enum $name<'i> {
             $(
                 $(#[$meta])*
                 $variant($inner_ty),
             )+
         }
 
-        impl $name {
-            pub fn parse_value<'i, 't>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
+        impl<'i> $name<'i> {
+            pub fn parse_value<'t>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
                 let location = input.current_source_location();
                 match name {
                     $(
