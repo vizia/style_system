@@ -1,8 +1,8 @@
 use crate::{
-    define_property, Angle, BorderColor, BorderCornerShape, BorderRadius,
-    BorderWidth, BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty,
-    Display, FontSize, InsetKeyword, LayoutType, Length, Opacity, Overflow, Parse, PositionType,
-    Rect, Scale, Transform, Transition, Translate, Units, Visibility,
+    define_property, Angle, BorderColor, BorderCornerShape, BorderRadius, BorderWidth,
+    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty, Display,
+    FontSize, InsetKeyword, LayoutType, Length, Opacity, Overflow, Parse, PositionType, Rect,
+    Scale, Transform, Transition, Translate, Units, Visibility,
 };
 use cssparser::Parser;
 
