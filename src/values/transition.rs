@@ -4,7 +4,7 @@ use cssparser::{ParseError, ParseErrorKind, Parser};
 /// Defines a transition that allows to change property values smoothly, over a given duration.
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Transition {
-    /// A list of properties affected by transition.
+    /// The property affected by the transition.
     pub property: String,
     /// The duration of the transition.
     pub duration: Duration,
