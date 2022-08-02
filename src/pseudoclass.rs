@@ -7,6 +7,8 @@ pub enum PseudoClass<'i> {
     Hover,
     Active,
     Focus,
+    FocusVisible,
+    FocusWithin,
 
     Enabled,
     Disabled,

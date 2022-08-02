@@ -143,7 +143,7 @@ test {
 
     const EXAMPLE: &str = r#"
 button {
-    background-color: blue;
+    border-top-left-radius: 2px;
 }
 "#;
 

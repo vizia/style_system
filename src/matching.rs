@@ -1,5 +1,8 @@
 mod test {
-    use std::{collections::HashMap, hash::Hash};
+    use std::{
+        collections::{HashMap, HashSet},
+        hash::Hash,
+    };
 
     use cssparser::*;
     use parcel_selectors::{
@@ -8,7 +11,7 @@ mod test {
         OpaqueElement, SelectorList,
     };
 
-    use crate::{CustomParseError, SelectorIdent, SelectorParser, Selectors};
+    use crate::{pseudoclass, CustomParseError, SelectorIdent, SelectorParser, Selectors};
 
     fn parse<'i>(
         input: &'i str,
@@ -28,9 +31,27 @@ mod test {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct Entity(u32);
 
+    use bitflags::bitflags;
+
+    bitflags! {
+        /// A bitflag of possible pseudoclasses.
+        ///
+        /// This type is part of the prelude.
+        pub struct PseudoClass: u8 {
+            const HOVER = 1;
+            const OVER = 1 << 1;
+            const ACTIVE = 1 << 2;
+            const FOCUS = 1 << 3;
+            const DISABLED = 1 << 4;
+            const CHECKED = 1 << 5;
+        }
+    }
+
     #[derive(Debug)]
     pub struct Store {
         element: HashMap<Entity, String>,
+        classes: HashMap<Entity, HashSet<String>>,
+        pseudo_class: HashMap<Entity, PseudoClass>,
     }
 
     #[derive(Debug, Clone)]
@@ -136,6 +157,10 @@ mod test {
             name: &<Self::Impl as parcel_selectors::SelectorImpl<'i>>::Identifier,
             case_sensitivity: parcel_selectors::attr::CaseSensitivity,
         ) -> bool {
+            if let Some(classes) = self.store.classes.get(&self.entity) {
+                return classes.contains(name.0.as_ref());
+            }
+
             false
         }
 
@@ -169,7 +194,37 @@ mod test {
         where
             F: FnMut(&Self, parcel_selectors::matching::ElementSelectorFlags),
         {
-            false
+            if let Some(psudeo_class_flag) = self.store.pseudo_class.get(&self.entity) {
+                match pc {
+                    crate::PseudoClass::Hover => psudeo_class_flag.contains(PseudoClass::HOVER),
+                    crate::PseudoClass::Active => todo!(),
+                    crate::PseudoClass::Focus => todo!(),
+                    crate::PseudoClass::FocusVisible => todo!(),
+                    crate::PseudoClass::FocusWithin => todo!(),
+                    crate::PseudoClass::Enabled => todo!(),
+                    crate::PseudoClass::Disabled => todo!(),
+                    crate::PseudoClass::ReadOnly => todo!(),
+                    crate::PseudoClass::ReadWrite => todo!(),
+                    crate::PseudoClass::PlaceHolderShown => todo!(),
+                    crate::PseudoClass::Default => todo!(),
+                    crate::PseudoClass::Checked => todo!(),
+                    crate::PseudoClass::Indeterminate => todo!(),
+                    crate::PseudoClass::Blank => todo!(),
+                    crate::PseudoClass::Valid => todo!(),
+                    crate::PseudoClass::Invalid => todo!(),
+                    crate::PseudoClass::InRange => todo!(),
+                    crate::PseudoClass::OutOfRange => todo!(),
+                    crate::PseudoClass::Required => todo!(),
+                    crate::PseudoClass::Optional => todo!(),
+                    crate::PseudoClass::UserValid => todo!(),
+                    crate::PseudoClass::UserInvalid => todo!(),
+                    crate::PseudoClass::Lang(_) => todo!(),
+                    crate::PseudoClass::Dir(_) => todo!(),
+                    crate::PseudoClass::Custom(_) => todo!(),
+                }
+            } else {
+                false
+            }
         }
     }
 
@@ -177,6 +232,8 @@ mod test {
     fn asterisk_match() {
         let mut store = Store {
             element: HashMap::new(),
+            classes: HashMap::new(),
+            pseudo_class: HashMap::new(),
         };
 
         let root = Entity(0);
@@ -209,6 +266,8 @@ mod test {
     fn element_match() {
         let mut store = Store {
             element: HashMap::new(),
+            classes: HashMap::new(),
+            pseudo_class: HashMap::new(),
         };
 
         let root = Entity(0);
@@ -234,10 +293,133 @@ mod test {
             let result = matches_selector_list(&selector_list, &root_node, &mut context);
 
             println!("Result: {}", result);
+            assert_eq!(result, true);
 
             let result = matches_selector_list(&selector_list, &child_node, &mut context);
 
             println!("Result: {}", result);
+            assert_eq!(result, false);
+        }
+    }
+
+    #[test]
+    fn class_match() {
+        let mut store = Store {
+            element: HashMap::new(),
+            classes: HashMap::new(),
+            pseudo_class: HashMap::new(),
+        };
+
+        let root = Entity(0);
+        let child = Entity(1);
+
+        store.classes.insert(root, HashSet::new());
+
+        if let Some(classes) = store.classes.get_mut(&root) {
+            classes.insert(String::from("foo"));
+            classes.insert(String::from("bar"));
+        }
+
+        store.classes.insert(child, HashSet::new());
+
+        if let Some(classes) = store.classes.get_mut(&child) {
+            classes.insert(String::from("bar"));
+        }
+
+        let root_node = Node {
+            entity: root,
+            store: &store,
+        };
+
+        let child_node = Node {
+            entity: child,
+            store: &store,
+        };
+
+        if let Ok(selector_list) = parse(".foo") {
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
+            assert_eq!(result, true);
+
+            let result = matches_selector_list(&selector_list, &child_node, &mut context);
+            assert_eq!(result, false);
+        }
+
+        if let Ok(selector_list) = parse(".bar") {
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
+            assert_eq!(result, true);
+
+            let result = matches_selector_list(&selector_list, &child_node, &mut context);
+            assert_eq!(result, true);
+        }
+
+        if let Ok(selector_list) = parse(".foo.bar") {
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
+            assert_eq!(result, true);
+
+            let result = matches_selector_list(&selector_list, &child_node, &mut context);
+            assert_eq!(result, false);
+        }
+
+        if let Ok(selector_list) = parse(".foo, .bar") {
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
+            assert_eq!(result, true);
+
+            let result = matches_selector_list(&selector_list, &child_node, &mut context);
+            assert_eq!(result, true);
+        }
+    }
+
+    #[test]
+    fn pseudoclass_match() {
+        let mut store = Store {
+            element: HashMap::new(),
+            classes: HashMap::new(),
+            pseudo_class: HashMap::new(),
+        };
+
+        let root = Entity(0);
+        let child = Entity(1);
+
+        store.element.insert(root, String::from("window"));
+        store.pseudo_class.insert(root, PseudoClass::empty());
+
+        if let Some(pseudoclass) = store.pseudo_class.get_mut(&root) {
+            pseudoclass.set(PseudoClass::HOVER, true);
+        }
+
+        store.element.insert(child, String::from("child"));
+
+        let root_node = Node {
+            entity: root,
+            store: &store,
+        };
+
+        let child_node = Node {
+            entity: child,
+            store: &store,
+        };
+
+        if let Ok(selector_list) = parse("window:hover") {
+            let mut context =
+                MatchingContext::new(MatchingMode::Normal, None, None, QuirksMode::NoQuirks);
+
+            let result = matches_selector_list(&selector_list, &root_node, &mut context);
+            assert_eq!(result, true);
+
+            let result = matches_selector_list(&selector_list, &child_node, &mut context);
+            assert_eq!(result, false);
         }
     }
 }
