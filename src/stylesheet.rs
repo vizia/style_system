@@ -144,6 +144,7 @@ test {
     const EXAMPLE: &str = r#"
 button {
     border-top-left-radius: 2px;
+    --custom: 5px;
 }
 "#;
 

@@ -68,9 +68,8 @@ pub(crate) fn parse_declaration<'i, 't>(
     important_declarations: &mut DeclarationList<'i>,
     options: &ParserOptions,
 ) -> Result<(), ParseError<'i, CustomParseError<'i>>> {
-    let property = input.parse_until_before(Delimiter::Bang, |input| {
-        Property::parse_value(name.as_ref(), input)
-    })?;
+    let property =
+        input.parse_until_before(Delimiter::Bang, |input| Property::parse_value(name, input))?;
 
     let important = input
         .try_parse(|input| {

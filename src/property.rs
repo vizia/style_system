@@ -159,13 +159,12 @@ define_property! {
 
         // Cursor
         "cursor": Cursor(CursorIcon),
-        "custom": Custom(CustomProperty<'i>),
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use cssparser::ParserInput;
+    use cssparser::{CowRcStr, ParserInput};
 
     use super::*;
 
@@ -173,7 +172,8 @@ mod tests {
     fn parse_property() {
         let mut parser_input = ParserInput::new("red");
         let mut parser = Parser::new(&mut parser_input);
-        let parsed_property = Property::parse_value("background-color", &mut parser);
+        let parsed_property =
+            Property::parse_value(CowRcStr::from("background-color"), &mut parser);
 
         println!("{:?}", parsed_property);
     }

@@ -59,20 +59,26 @@ macro_rules! define_property {
                 $(#[$meta])*
                 $variant($inner_ty),
             )+
+            Custom(CustomProperty<'i>),
         }
 
         impl<'i> $name<'i> {
-            pub fn parse_value<'t>(name: &str, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
+            pub fn parse_value<'t>(name: cssparser::CowRcStr<'i>, input: &mut Parser<'i, 't>) -> Result<Self, cssparser::ParseError<'i, CustomParseError<'i>>> {
                 let location = input.current_source_location();
-                match name {
+                let name_ref = name.as_ref();
+                match name_ref {
                     $(
                         $str => Ok($name::$variant(<$inner_ty>::parse(input)?)),
                     )+
                     _ => {
-                        return Err(cssparser::ParseError {
-                            kind: cssparser::ParseErrorKind::Custom(CustomParseError::InvalidDeclaration),
-                            location,
-                        });
+                        if let Ok(custom) = CustomProperty::parse(name, input) {
+                            Ok(Property::Custom(custom))
+                        } else {
+                            Err(cssparser::ParseError {
+                                kind: cssparser::ParseErrorKind::Custom(CustomParseError::InvalidDeclaration),
+                                location,
+                            })
+                        }
                     }
                 }
             }

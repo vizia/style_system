@@ -13,7 +13,7 @@ impl<'i> cssparser::DeclarationParser<'i> for DeclarationParser {
         name: CowRcStr<'i>,
         input: &mut Parser<'i, 't>,
     ) -> Result<Self::Declaration, ParseError<'i, Self::Error>> {
-        Property::parse_value(&name.as_ref(), input)
+        Property::parse_value(name, input)
     }
 }
 
