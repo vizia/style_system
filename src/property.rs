@@ -1,6 +1,6 @@
 use crate::{
     define_property, Angle, BorderColor, BorderCornerShape, BorderRadius, BorderWidth,
-    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty, Display,
+    BorderWidthValue, BoxShadow, Color, CursorIcon, CustomParseError, CustomProperty, UnparsedProperty, Display,
     FontSize, InsetKeyword, LayoutType, Length, Opacity, Overflow, Parse, PositionType, Rect,
     Scale, Transform, Transition, Translate, Units, Visibility,
 };

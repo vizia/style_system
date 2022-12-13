@@ -1,6 +1,6 @@
 use cssparser::*;
 
-use crate::{CustomParseError, DashedIdent, Parse};
+use crate::{CustomParseError, DashedIdent, Parse, ParserOptions};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CustomProperty<'i> {
@@ -21,6 +21,22 @@ impl<'i> CustomProperty<'i> {
 
         let value = TokenList::parse(input)?;
         Ok(CustomProperty { name, value })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct UnparsedProperty<'i> {
+    pub name: CowRcStr<'i>,
+    pub value: TokenList<'i>,
+}
+
+impl<'i> UnparsedProperty<'i> {
+    pub fn parse<'t>(
+        name: CowRcStr<'i>,
+        input: &mut Parser<'i, 't>,
+    ) -> Result<Self, ParseError<'i, CustomParseError<'i>>> {
+        let value = TokenList::parse(input)?;
+        Ok(UnparsedProperty { name, value })
     }
 }
 

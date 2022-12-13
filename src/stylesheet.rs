@@ -8,7 +8,9 @@ use cssparser::*;
 #[derive(Debug)]
 pub struct StyleSheet<'i, 'o> {
     // List of top level rules
-    rules: CssRuleList<'i>,
+    pub rules: CssRuleList<'i>,
+
+
     options: ParserOptions<'o>,
 }
 
@@ -141,11 +143,14 @@ test {
 }
 "#;
 
-    const EXAMPLE: &str = r#"
-button {
-    border-top-left-radius: 2px;
-    --custom: 5px;
-}
+const EXAMPLE: &str = r#"
+    :root {
+        --main-bg-color: brown;
+    }
+
+    button {
+        background-color: var(--main-bg-color);
+    }
 "#;
 
     #[test]
